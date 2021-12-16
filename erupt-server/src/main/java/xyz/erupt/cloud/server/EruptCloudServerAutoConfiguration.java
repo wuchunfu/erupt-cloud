@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.client;
+package xyz.erupt.cloud.server;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;

@@ -24,8 +24,5 @@ public class EruptClientProp {
     //服务端地址（支持集群）
     private String[] serverAddresses;
 
-    //服务端 key
-    private String serverKey;
-
 
 }
