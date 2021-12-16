@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>erupt-client</artifactId>
-    <description>erupt-cloud client</description>
+    <artifactId>erupt-common</artifactId>
+    <description>erupt-cloud common</description>
     <packaging>jar</packaging>
 
     <parent>
@@ -22,18 +22,9 @@
         </dependency>
         <dependency>
             <groupId>xyz.erupt</groupId>
-            <artifactId>erupt-core</artifactId>
+            <artifactId>erupt-upms</artifactId>
             <version>${parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.erupt</groupId>
-            <artifactId>erupt-jpa</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor</artifactId>
-            <version>2.6.17</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

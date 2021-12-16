@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.client.model;
+package xyz.erupt.cloud.model;
 
 import xyz.erupt.jpa.model.BaseModel;
 
