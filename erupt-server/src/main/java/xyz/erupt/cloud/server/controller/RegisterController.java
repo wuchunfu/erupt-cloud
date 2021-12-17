@@ -2,6 +2,8 @@ package xyz.erupt.cloud.server.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 客户端注册控制器
  *
@@ -11,7 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RegisterController {
 
+    private HttpServletRequest request;
+
     private void register(String secret, String clientName) {
+
+//        HttpUtil.createpost
 
     }
 

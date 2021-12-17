@@ -20,7 +20,7 @@
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>xyz.erupt</groupId>
+        <groupId>xyz.erupt.cloud</groupId>
         <artifactId>erupt-cloud</artifactId>
         <version>1.9.3</version>
         <relativePath>../pom.xml</relativePath>

@@ -5,10 +5,22 @@
 
     <artifactId>erupt-server</artifactId>
     <description>erupt-cloud server</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>xyz.erupt</groupId>
+        <groupId>xyz.erupt.cloud</groupId>
         <artifactId>erupt-cloud</artifactId>
         <version>1.9.3</version>
         <relativePath>../pom.xml</relativePath>
@@ -25,6 +37,11 @@
             <artifactId>erupt-upms</artifactId>
             <version>${parent.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+            <version>5.7.7</version>
         </dependency>
     </dependencies>
 

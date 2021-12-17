@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyz.erupt</groupId>
+    <groupId>xyz.erupt.cloud</groupId>
     <artifactId>erupt-cloud</artifactId>
     <version>1.9.3</version>
     <description>remote call erupt</description>

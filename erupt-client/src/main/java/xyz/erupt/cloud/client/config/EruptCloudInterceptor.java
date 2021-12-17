@@ -29,6 +29,11 @@ public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInte
     //不接受来自erupt-api的任何http请求
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //远程加载的erupt允许跨域
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Methods", "*");
+
         response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
         response.sendError(response.getStatus());
         return false;
