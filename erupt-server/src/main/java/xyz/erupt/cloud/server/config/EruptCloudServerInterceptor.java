@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,9 +15,14 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.constant.EruptRestPath;
+import xyz.erupt.core.service.EruptCoreService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author YuePeng
@@ -28,10 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 @Order(1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
 
-
     String TOKEN_HEADER = "token";
-
-    String ERUPT_HEADER = "erupt";
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -49,20 +52,24 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             return true;
         }
         if (EruptRouter.VerifyType.ERUPT == eruptRouter.verifyType()) {
+            if (null != EruptCoreService.getErupt(request.getHeader("erupt"))) {
+                return true;
+            }
+            Map<String, String> headers = new HashMap<>();
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String name = headerNames.nextElement();
+                headers.put(name, request.getHeader(name));
+            }
             HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()),
                     "https://www.erupt.xyz/demo" + request.getRequestURI())
-                    .header(TOKEN_HEADER, "9RHHp7hRXWU9sAhz")
-                    .header(ERUPT_HEADER, request.getHeader(ERUPT_HEADER))
-                    .execute();
-            response.setStatus(httpResponse.getStatus());
-            response.getWriter().write(httpResponse.body());
+                    .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
+                    .addHeaders(headers).header(TOKEN_HEADER, "VsEjtBmUackiH3cY").execute();
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
-            if (httpResponse.getStatus() == HttpStatus.OK.value()) {
-                String body = httpResponse.body();
-                response.setCharacterEncoding("utf-8");
-                response.reset();
-                response.getWriter().write(body);
-            } else {
+            response.reset();
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.getWriter().write(httpResponse.body());
+            if (httpResponse.getStatus() != HttpStatus.OK.value()) {
                 response.sendError(httpResponse.getStatus());
             }
             return false;
