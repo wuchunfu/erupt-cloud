@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.core.annotation.EruptRouter;
@@ -33,8 +32,6 @@ import java.util.Map;
 @Component
 @Order(1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
-
-    String TOKEN_HEADER = "token";
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -64,7 +61,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()),
                     "https://www.erupt.xyz/demo" + request.getRequestURI())
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
-                    .addHeaders(headers).header(TOKEN_HEADER, "VsEjtBmUackiH3cY").execute();
+                    .addHeaders(headers).header("token", "VsEjtBmUackiH3cY").execute();
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
             response.reset();
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -78,8 +75,4 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         }
     }
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        System.out.println(123);
-    }
 }

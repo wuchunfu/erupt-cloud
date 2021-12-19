@@ -10,6 +10,7 @@ import xyz.erupt.annotation.sub_field.Edit;
 import xyz.erupt.annotation.sub_field.Readonly;
 import xyz.erupt.annotation.sub_field.View;
 import xyz.erupt.annotation.sub_field.ViewType;
+import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
 import xyz.erupt.upms.helper.HyperModelUpdateVo;
 
@@ -46,9 +47,12 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @Transient
     @EruptField(
-            views = @View(title = "状态", sortable = true, type = ViewType.HTML)
+            views = @View(title = "状态", sortable = true, type = ViewType.HTML),
+            edit = @Edit(title = "状态", notNull = true, boolType = @BoolType(
+                    trueText = "启用", falseText = "禁用"
+            ))
     )
-    private String status;
+    private Boolean status;
 
     @Transient
     @EruptField(
