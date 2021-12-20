@@ -1,12 +1,12 @@
 package xyz.erupt.cloud.client.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.core.constant.EruptRestPath;
+import xyz.erupt.core.view.MetaUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,14 +28,17 @@ public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInte
 
     //不接受来自erupt-api的任何http请求
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         //远程加载的erupt允许跨域
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Headers", "*");
         response.setHeader("Access-Control-Allow-Methods", "*");
+        MetaUser.register(new MetaUser("1", "test", "测试"));
+        return true;
+    }
 
-        response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
-        response.sendError(response.getStatus());
-        return false;
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        MetaUser.remove();
     }
 }
