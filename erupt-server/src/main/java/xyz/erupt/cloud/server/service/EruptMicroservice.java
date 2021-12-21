@@ -1,10 +1,12 @@
 package xyz.erupt.cloud.server.service;
 
 import org.springframework.stereotype.Service;
-import xyz.erupt.cloud.server.base.ClientInfo;
+import xyz.erupt.cloud.server.base.MetaClient;
+import xyz.erupt.jpa.dao.EruptDao;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author YuePeng
@@ -13,15 +15,16 @@ import java.util.List;
 @Service
 public class EruptMicroservice {
 
-    private final List<ClientInfo> clientInfos = new ArrayList<>();
+    private static final Map<String, MetaClient> metaClientMap = new HashMap<>();
 
-    /**
-     * @param secret      服务秘钥
-     * @param clientName  服务名称
-     * @param contextPath 上下文路径
-     */
-    public void registerClient(String secret, String clientName, String contextPath) {
+    @Resource
+    private EruptDao eruptDao;
 
+
+    public void registerClient(MetaClient metaClient) {
+//        metaClient.setEruptMap(metaClient.getErupts().stream().collect(Maps));
+        metaClientMap.put(metaClient.getClientCode(), metaClient);
     }
+
 
 }

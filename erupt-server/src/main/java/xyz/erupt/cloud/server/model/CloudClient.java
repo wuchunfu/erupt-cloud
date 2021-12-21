@@ -29,7 +29,8 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @EruptField(
             views = @View(title = "编码", sortable = true),
-            edit = @Edit(title = "编码", notNull = true, search = @Search(vague = true))
+            edit = @Edit(title = "编码", notNull = true, search = @Search(vague = true),
+                    readonly = @Readonly(add = false))
     )
     private String code;
 
