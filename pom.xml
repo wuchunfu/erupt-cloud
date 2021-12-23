@@ -5,7 +5,7 @@
 
     <groupId>xyz.erupt.cloud</groupId>
     <artifactId>erupt-cloud</artifactId>
-    <version>1.9.3</version>
+    <version>1.9.4</version>
     <description>remote call erupt</description>
     <packaging>pom</packaging>
     <url>https://www.erupt.xyz</url>
@@ -19,6 +19,7 @@
     <modules>
         <module>erupt-server</module>
         <module>erupt-client</module>
+        <module>erupt-common</module>
     </modules>
 
     <dependencies>
@@ -31,13 +32,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>xyz.erupt</groupId>
-                <artifactId>erupt</artifactId>
-                <version>${version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>

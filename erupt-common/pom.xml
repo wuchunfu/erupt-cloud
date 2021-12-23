@@ -8,18 +8,13 @@
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>xyz.erupt</groupId>
+        <groupId>xyz.erupt.cloud</groupId>
         <artifactId>erupt-cloud</artifactId>
-        <version>1.9.3</version>
+        <version>1.9.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>xyz.erupt</groupId>
             <artifactId>erupt-upms</artifactId>

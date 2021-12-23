@@ -5,24 +5,12 @@
 
     <artifactId>erupt-client</artifactId>
     <description>erupt-cloud client</description>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>6</source>
-                    <target>6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>xyz.erupt.cloud</groupId>
         <artifactId>erupt-cloud</artifactId>
-        <version>1.9.3</version>
+        <version>1.9.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -48,7 +36,5 @@
             <version>5.7.17</version>
         </dependency>
     </dependencies>
-
-
 </project>
 
