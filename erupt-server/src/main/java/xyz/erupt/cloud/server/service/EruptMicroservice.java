@@ -22,14 +22,10 @@ public class EruptMicroservice {
     @Resource
     private HttpServletRequest request;
 
-
     public void registerClient(MetaClient metaClient) {
-        Optional.ofNullable(metaClientMap.get(metaClient.getClientCode())).ifPresent(it->
-                metaClient.getSourceIp().addAll(it.getSourceIp()));
-        MetaClient.Location location = new MetaClient.Location();
-        location.setIp(IpUtil.getIpAddr(request));
-        location.setPort(request.getRemotePort());
-        metaClient.getSourceIp().add(location);
+        Optional.ofNullable(metaClientMap.get(metaClient.getClientCode())).ifPresent(it ->
+                metaClient.getLocations().addAll(it.getLocations()));
+        metaClient.getLocations().add(new MetaClient.Location(IpUtil.getIpAddr(request), request.getRemotePort()));
         metaClientMap.put(metaClient.getClientCode(), metaClient);
     }
 

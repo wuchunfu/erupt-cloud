@@ -28,9 +28,7 @@ public class EruptMicroserviceController {
     private final EruptMicroservice eruptMicroservice;
 
     @RequestMapping("/register-client/{code}")
-    public R registerClient(@PathVariable("code") final String clientCode,
-                            @RequestBody final MetaClient metaClient) {
-
+    public R registerClient(@PathVariable("code") final String clientCode, @RequestBody final MetaClient metaClient) {
         CloudClient cloudClient = eruptDao.queryEntity(CloudClient.class, "code = :code", new HashMap<String, Object>() {{
             this.put("code", clientCode);
         }});
@@ -38,11 +36,12 @@ public class EruptMicroserviceController {
             return R.error(clientCode + " not found");
         }
         if (!cloudClient.getSecret().equals(metaClient.getSecret())) {
-            return R.error(cloudClient.getName() + " secret key error");
+            return R.error(cloudClient.getCode() + " secret key error");
         }
         if (!cloudClient.getStatus()) {
-            return R.error(cloudClient.getName() + " Prohibiting the registration");
+            return R.error(cloudClient.getName() + " prohibiting the registration");
         }
+        metaClient.setClientCode(clientCode);
         eruptMicroservice.registerClient(metaClient);
         return R.success();
     }

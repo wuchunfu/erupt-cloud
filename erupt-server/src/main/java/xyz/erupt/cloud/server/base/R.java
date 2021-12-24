@@ -17,22 +17,22 @@ public class R {
 
     private String message;
 
-    public R(Object data, Boolean success, String message) {
+    public R(Boolean success, String message, Object data) {
         this.data = data;
         this.success = success;
         this.message = message;
     }
 
     public static R success() {
-        return new R(null, true, null);
+        return new R(true, null, null);
     }
 
     public static R success(String data) {
-        return new R(data, true, null);
+        return new R(true, null, data);
     }
 
     public static R error(String msg) {
-        return new R(null, false, msg);
+        return new R(false, msg, null);
     }
 
 }

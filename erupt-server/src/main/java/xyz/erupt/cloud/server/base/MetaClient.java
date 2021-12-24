@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,11 +24,11 @@ public class MetaClient {
     //应用上下文
     private String contextPath;
 
-    //服务IP
-    private Set<Location> sourceIp = new HashSet<>();
+    //服务地址
+    private Set<Location> locations = new HashSet<>();
 
     //服务所管理的erupt清单
-    private List<String> erupts;
+    private Set<String> erupts;
 
     //由erupts转换而来
     private Map<String, String> eruptMap;
@@ -37,6 +36,14 @@ public class MetaClient {
     @Getter
     @Setter
     public static class Location {
+
+        public Location(String ip, int port) {
+            this.ip = ip;
+            this.port = port;
+        }
+
+        public Location() {
+        }
 
         public String ip;
 

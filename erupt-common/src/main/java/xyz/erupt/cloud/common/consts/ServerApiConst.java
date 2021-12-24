@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.common.constant;
+package xyz.erupt.cloud.common.consts;
 
 /**
  * @author YuePeng
