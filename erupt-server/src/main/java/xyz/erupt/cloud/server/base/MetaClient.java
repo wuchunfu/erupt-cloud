@@ -26,11 +26,21 @@ public class MetaClient {
     private String contextPath;
 
     //服务IP
-    private Set<String> sourceIp = new HashSet<>();
+    private Set<Location> sourceIp = new HashSet<>();
 
     //服务所管理的erupt清单
     private List<String> erupts;
 
     //由erupts转换而来
     private Map<String, String> eruptMap;
+
+    @Getter
+    @Setter
+    public static class Location {
+
+        public String ip;
+
+        public int port;
+
+    }
 }
