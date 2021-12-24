@@ -11,7 +11,6 @@ import xyz.erupt.cloud.server.model.CloudClient;
 import xyz.erupt.cloud.server.service.EruptMicroservice;
 import xyz.erupt.jpa.dao.EruptDao;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 /**
@@ -22,16 +21,15 @@ import java.util.HashMap;
  */
 @RestController
 @AllArgsConstructor
-public class ServerController {
+public class EruptMicroserviceController {
 
     private final EruptDao eruptDao;
 
     private final EruptMicroservice eruptMicroservice;
 
     @RequestMapping("/register-client/{code}")
-    public R registerClient(@PathVariable("code") String clientCode,
-                            @RequestBody MetaClient metaClient,
-                            HttpServletRequest request) {
+    public R registerClient(@PathVariable("code") final String clientCode,
+                            @RequestBody final MetaClient metaClient) {
         CloudClient cloudClient = eruptDao.queryEntity(CloudClient.class,
                 "code = :code and secret = :secret",
                 new HashMap<String, Object>() {{

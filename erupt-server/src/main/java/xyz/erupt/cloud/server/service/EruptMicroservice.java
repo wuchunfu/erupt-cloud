@@ -5,6 +5,7 @@ import xyz.erupt.cloud.server.base.MetaClient;
 import xyz.erupt.jpa.dao.EruptDao;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +21,12 @@ public class EruptMicroservice {
     @Resource
     private EruptDao eruptDao;
 
+    @Resource
+    private HttpServletRequest request;
+
 
     public void registerClient(MetaClient metaClient) {
-//        metaClient.setEruptMap(metaClient.getErupts().stream().collect(Maps));
+
         metaClientMap.put(metaClient.getClientCode(), metaClient);
     }
 

@@ -46,7 +46,6 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
     )
     private String secret;
 
-    @Transient
     @EruptField(
             views = @View(title = "状态", sortable = true, type = ViewType.HTML),
             edit = @Edit(title = "状态", notNull = true, boolType = @BoolType(
@@ -54,6 +53,12 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
             ))
     )
     private Boolean status;
+
+    @Transient
+    @EruptField(
+            views = @View(title = "Erupt类数量", sortable = true, type = ViewType.HTML)
+    )
+    private String eruptNum;
 
     @Transient
     @EruptField(
