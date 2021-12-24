@@ -15,7 +15,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.constant.EruptRestPath;
 import xyz.erupt.core.service.EruptCoreService;
+import xyz.erupt.upms.service.EruptContextService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +34,9 @@ import java.util.Map;
 @Component
 @Order(1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
+
+    @Resource
+    private EruptContextService eruptContextService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

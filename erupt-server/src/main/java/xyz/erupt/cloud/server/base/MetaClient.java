@@ -1,8 +1,10 @@
 package xyz.erupt.cloud.server.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +18,7 @@ import java.util.Set;
 public class MetaClient {
 
     //秘钥
+    @JsonIgnore
     private String secret;
 
     //应用编码
@@ -28,10 +31,10 @@ public class MetaClient {
     private Set<Location> locations = new HashSet<>();
 
     //服务所管理的erupt清单
-    private Set<String> erupts;
+    private Set<String> erupts = new HashSet<>();
 
     //由erupts转换而来
-    private Map<String, String> eruptMap;
+    private Map<String, String> eruptMap = new HashMap<>();
 
     @Getter
     @Setter
