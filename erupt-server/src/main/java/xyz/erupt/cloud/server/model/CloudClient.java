@@ -3,13 +3,11 @@ package xyz.erupt.cloud.server.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.Type;
 import xyz.erupt.annotation.Erupt;
 import xyz.erupt.annotation.EruptField;
 import xyz.erupt.annotation.fun.DataProxy;
-import xyz.erupt.annotation.sub_field.Edit;
-import xyz.erupt.annotation.sub_field.Readonly;
-import xyz.erupt.annotation.sub_field.View;
-import xyz.erupt.annotation.sub_field.ViewType;
+import xyz.erupt.annotation.sub_field.*;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
 import xyz.erupt.upms.helper.HyperModelUpdateVo;
@@ -66,10 +64,11 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
     )
     private String instanceNum;
 
-    @Column(length = 2000)
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @EruptField(
             views = @View(title = "备注"),
-            edit = @Edit(title = "备注")
+            edit = @Edit(title = "备注", type = EditType.HTML_EDITOR)
     )
     private String remark;
 
