@@ -2,7 +2,6 @@ package xyz.erupt.cloud.server.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.Type;
 import xyz.erupt.annotation.Erupt;
 import xyz.erupt.annotation.EruptField;
@@ -10,6 +9,7 @@ import xyz.erupt.annotation.fun.DataProxy;
 import xyz.erupt.annotation.sub_field.*;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
+import xyz.erupt.core.util.Erupts;
 import xyz.erupt.upms.helper.HyperModelUpdateVo;
 
 import javax.persistence.*;
@@ -74,6 +74,6 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @Override
     public void beforeAdd(CloudClient cloudClient) {
-        cloudClient.setSecret(RandomStringUtils.randomAlphanumeric(8));
+        cloudClient.setSecret(Erupts.generateCode());
     }
 }
