@@ -35,8 +35,8 @@ public class EruptMicroserviceController {
         if (null == cloudClient) {
             return R.error(clientCode + " not found");
         }
-        if (!cloudClient.getSecret().equals(metaClient.getSecret())) {
-            return R.error(cloudClient.getCode() + " secret key error");
+        if (!cloudClient.getAccessToken().equals(metaClient.getAccessToken())) {
+            return R.error(cloudClient.getCode() + " Access token invalid");
         }
         if (!cloudClient.getStatus()) {
             return R.error(cloudClient.getName() + " prohibiting the registration");

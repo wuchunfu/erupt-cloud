@@ -1,6 +1,5 @@
 package xyz.erupt.cloud.server.base;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +16,8 @@ import java.util.Set;
 @Setter
 public class MetaClient {
 
-    //秘钥
-    @JsonIgnore
-    private String secret;
+    //访问令牌
+    private String accessToken;
 
     //应用编码
     private String clientCode;

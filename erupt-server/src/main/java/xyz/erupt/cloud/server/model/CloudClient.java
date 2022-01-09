@@ -38,11 +38,13 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
     )
     private String name;
 
+
+
     @EruptField(
-            views = @View(title = "秘钥", sortable = true, type = ViewType.HTML),
-            edit = @Edit(title = "秘钥", readonly = @Readonly)
+            views = @View(title = "Access Token", sortable = true, type = ViewType.HTML),
+            edit = @Edit(title = "Access Token", readonly = @Readonly)
     )
-    private String secret;
+    private String accessToken;
 
     @EruptField(
             views = @View(title = "状态", sortable = true, type = ViewType.HTML),
@@ -74,6 +76,6 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @Override
     public void beforeAdd(CloudClient cloudClient) {
-        cloudClient.setSecret(Erupts.generateCode());
+        cloudClient.setAccessToken(Erupts.generateCode(16));
     }
 }
