@@ -21,24 +21,23 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "e_cloud_client", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
+@Table(name = "e_cloud_client", uniqueConstraints = @UniqueConstraint(columnNames = "app_name"))
 @Erupt(name = "服务管理")
 public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudClient> {
 
+    public static final String APP_NAME = "appName";
+
     @EruptField(
-            views = @View(title = "编码", sortable = true),
-            edit = @Edit(title = "编码", notNull = true, search = @Search(vague = true),
-                    readonly = @Readonly)
+            views = @View(title = "服务名", sortable = true),
+            edit = @Edit(title = "服务名", notNull = true, search = @Search(vague = true))
     )
-    private String code;
+    private String appName;
 
     @EruptField(
             views = @View(title = "名称", sortable = true),
             edit = @Edit(title = "名称", notNull = true, search = @Search(vague = true))
     )
     private String name;
-
-
 
     @EruptField(
             views = @View(title = "Access Token", sortable = true, type = ViewType.HTML),

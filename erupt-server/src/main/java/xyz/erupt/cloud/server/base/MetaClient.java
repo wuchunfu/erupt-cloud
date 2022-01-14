@@ -34,6 +34,13 @@ public class MetaClient {
     //由erupts转换而来
     private Map<String, String> eruptMap = new HashMap<>();
 
+    //调用次数
+    private int count = 0;
+
+    public int getCount() {
+        return ++count;
+    }
+
     @Getter
     @Setter
     public static class Location {

@@ -6,7 +6,6 @@ import xyz.erupt.upms.util.IpUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EruptMicroservice {
 
     private static final Map<String, MetaClient> metaClientMap = new ConcurrentHashMap<>();
+
+    public static int getMetaClientNum() {
+        return metaClientMap.size();
+    }
+
+    public static MetaClient getMetaClient(String appName) {
+        return metaClientMap.get(appName);
+    }
 
     @Resource
     private HttpServletRequest request;

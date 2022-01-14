@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("erupt-cloud")
+@ConfigurationProperties("erupt-cloud.client")
 public class EruptClientProp {
 
-    //客户端名称
-    private String clientName;
+    //接入应用名称，用于分组隔离，推荐填写 本 Java 项目名称
+    private String appName;
 
     //客户端秘钥（在服务端界面生成）
-    private String clientSecret;
+    private String accessToken;
 
     //服务端地址（支持集群）
     private String[] serverAddresses;

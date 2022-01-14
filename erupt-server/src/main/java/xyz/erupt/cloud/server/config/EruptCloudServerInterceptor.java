@@ -12,8 +12,12 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import xyz.erupt.cloud.server.base.MetaClient;
+import xyz.erupt.cloud.server.service.EruptMicroservice;
 import xyz.erupt.core.annotation.EruptRouter;
+import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
+import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 import xyz.erupt.core.service.EruptCoreService;
 import xyz.erupt.upms.service.EruptContextService;
 
@@ -43,19 +47,24 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         registry.addInterceptor(this).addPathPatterns(EruptRestPath.ERUPT_API + "/**");
     }
 
-    //不接受来自erupt-api的任何http请求
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         EruptRouter eruptRouter = null;
         if (handler instanceof HandlerMethod) {
             eruptRouter = ((HandlerMethod) handler).getMethodAnnotation(EruptRouter.class);
         }
-        if (null == eruptRouter) {
-            return true;
-        }
+        if (null == eruptRouter) return true;
         if (EruptRouter.VerifyType.ERUPT == eruptRouter.verifyType()) {
-            if (null != EruptCoreService.getErupt(request.getHeader("erupt"))) {
-                return true;
+            if (EruptMicroservice.getMetaClientNum() <= 0) return true;
+            String erupt = request.getHeader(EruptMutualConst.ERUPT);
+            if (null != EruptCoreService.getErupt(erupt)) return true;
+            if (!erupt.contains(".")) return true;
+            int point = erupt.lastIndexOf(".");
+            String appName = erupt.substring(0, point);
+            String eruptName = erupt.substring(point);
+            MetaClient metaClient = EruptMicroservice.getMetaClient(appName);
+            if (null == metaClient) {
+                throw new EruptWebApiRuntimeException("The " + appName + " service is not registered");
             }
             Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
@@ -63,8 +72,10 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
                 String name = headerNames.nextElement();
                 headers.put(name, request.getHeader(name));
             }
+            MetaClient.Location location = metaClient.getLocations()
+                    .toArray(new MetaClient.Location[0])[metaClient.getCount() % metaClient.getLocations().size()];
             HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()),
-                    "https://www.erupt.xyz/demo" + request.getRequestURI())
+                    "https://www.erupt.xyz" + metaClient.getContextPath() + request.getRequestURI())
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
                     .addHeaders(headers).header("token", "VsEjtBmUackiH3cY").execute();
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
