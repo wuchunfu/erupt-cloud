@@ -17,6 +17,7 @@ import java.util.List;
 @ComponentScan
 @EnableConfigurationProperties
 public class EruptCloudServerAutoConfiguration implements EruptModule {
+
     @Override
     public ModuleInfo info() {
         return ModuleInfo.builder().name("erupt-cloud-server").build();
@@ -26,4 +27,5 @@ public class EruptCloudServerAutoConfiguration implements EruptModule {
     public List<MetaMenu> initMenus() {
         return EruptModule.super.initMenus();
     }
+
 }
