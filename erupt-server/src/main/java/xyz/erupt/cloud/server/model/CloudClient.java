@@ -42,7 +42,7 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @EruptField(
             views = @View(title = "Access Token", sortable = true, type = ViewType.HTML),
-            edit = @Edit(title = "Access Token", readonly = @Readonly)
+            edit = @Edit(title = "Access Token", readonly = @Readonly,search = @Search)
     )
     private String accessToken;
 
@@ -69,8 +69,8 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     @EruptField(
-            views = @View(title = "备注"),
-            edit = @Edit(title = "备注", type = EditType.HTML_EDITOR)
+            views = @View(title = "描述"),
+            edit = @Edit(title = "描述", type = EditType.HTML_EDITOR)
     )
     private String remark;
 
