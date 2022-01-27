@@ -32,14 +32,10 @@ public class EruptMicroserviceController {
         CloudClient cloudClient = eruptDao.queryEntity(CloudClient.class, CloudClient.APP_NAME + " = :" + CloudClient.APP_NAME, new HashMap<String, Object>() {{
             this.put(CloudClient.APP_NAME, appName);
         }});
-        if (null == cloudClient) {
-            return R.error(appName + " not found");
-        }
+        if (null == cloudClient) return R.error(appName + " not found");
+        if (!cloudClient.getStatus()) return R.error(cloudClient.getName() + " prohibiting the registration");
         if (!cloudClient.getAccessToken().equals(metaClient.getAccessToken())) {
             return R.error(cloudClient.getAppName() + " Access token invalid");
-        }
-        if (!cloudClient.getStatus()) {
-            return R.error(cloudClient.getName() + " prohibiting the registration");
         }
         metaClient.setClientCode(appName);
         eruptMicroservice.registerClient(metaClient);

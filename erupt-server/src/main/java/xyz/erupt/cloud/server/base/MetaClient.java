@@ -32,10 +32,10 @@ public class MetaClient {
     private Set<String> erupts = new HashSet<>();
 
     //由erupts转换而来
-    private Map<String, String> eruptMap = new HashMap<>();
+    private transient Map<String, String> eruptMap = new HashMap<>();
 
     //调用次数
-    private int count = 0;
+    private transient int count = 0;
 
     public int getCount() {
         return ++count;

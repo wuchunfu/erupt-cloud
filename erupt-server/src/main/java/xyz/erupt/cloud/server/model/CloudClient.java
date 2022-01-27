@@ -15,7 +15,6 @@ import xyz.erupt.upms.helper.HyperModelUpdateVo;
 import javax.persistence.*;
 
 /**
- *
  * @author YuePeng
  * date 2021/12/16 00:28
  */
@@ -42,7 +41,7 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
 
     @EruptField(
             views = @View(title = "Access Token", sortable = true, type = ViewType.HTML),
-            edit = @Edit(title = "Access Token", readonly = @Readonly,search = @Search)
+            edit = @Edit(title = "Access Token", readonly = @Readonly, search = @Search)
     )
     private String accessToken;
 
@@ -53,6 +52,12 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
             ))
     )
     private Boolean status;
+
+    @EruptField(
+            views = @View(title = "负责人", sortable = true),
+            edit = @Edit(title = "负责人", type = EditType.TAGS, notNull = true)
+    )
+    private String duty;
 
     @Transient
     @EruptField(
