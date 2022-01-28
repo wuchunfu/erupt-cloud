@@ -13,15 +13,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>xyz.erupt</groupId>
-            <artifactId>erupt-upms</artifactId>
-            <version>${parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
 
 </project>
 
