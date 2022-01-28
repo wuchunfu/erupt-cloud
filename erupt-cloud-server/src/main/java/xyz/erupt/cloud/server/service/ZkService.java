@@ -30,7 +30,11 @@ public class ZkService implements CommandLineRunner {
 
     //向zk推送节点信息
     public void putNode(MetaNode metaNode) {
-        zkClient.createPersistent(ERUPT_NODE + "/" + metaNode.getNodeName(), metaNode);
+        zkClient.createEphemeral(ERUPT_NODE + "/" + metaNode.getNodeName(), metaNode);
+    }
+
+    public void remove(MetaNode metaNode) {
+        zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
     }
 
     @Override
@@ -39,15 +43,13 @@ public class ZkService implements CommandLineRunner {
             log.info("Not configured zookeeper cluster");
             return;
         }
-        zkClient.createPersistent(ERUPT_NODE);
-        // 监听子节点发生变化
-        zkClient.subscribeChildChanges(ERUPT_NODE, (path, list) -> {
-            list.forEach(it -> {
-                log.info(ERUPT_NODE + ":children:" + it);
-                String info = zkClient.readData(ERUPT_NODE + it);
-                log.info(info);
-            });
-        });
+        zkClient.createEphemeral(ERUPT_NODE);
+        zkClient.subscribeChildChanges(ERUPT_NODE, (path, list) -> list.forEach(it -> {
+            log.info(path);
+            log.info(ERUPT_NODE + ":children:" + it);
+            String info = zkClient.readData(ERUPT_NODE + it);
+            log.info(info);
+        }));
         // 监听状态变化
         zkClient.subscribeStateChanges(new IZkStateListener() {
             @Override

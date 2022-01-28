@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
 import xyz.erupt.cloud.server.base.MetaNode;
-import xyz.erupt.cloud.server.service.EruptMicroservice;
+import xyz.erupt.cloud.server.service.EruptNodeMicroservice;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
@@ -56,14 +56,14 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         }
         if (null == eruptRouter) return true;
         if (EruptRouter.VerifyType.ERUPT == eruptRouter.verifyType()) {
-            if (EruptMicroservice.getMetaNodeNum() <= 0) return true;
+            if (EruptNodeMicroservice.getMetaNodeNum() <= 0) return true;
             String erupt = request.getHeader(EruptMutualConst.ERUPT);
             if (null != EruptCoreService.getErupt(erupt)) return true;
             if (!erupt.contains(".")) return true;
             int point = erupt.lastIndexOf(".");
             String appName = erupt.substring(0, point);
             String eruptName = erupt.substring(point);
-            MetaNode metaNode = EruptMicroservice.getMetaNode(appName);
+            MetaNode metaNode = EruptNodeMicroservice.getMetaNode(appName);
             if (null == metaNode) {
                 throw new EruptWebApiRuntimeException("The " + appName + " service is not registered");
             }
@@ -76,11 +76,9 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             headers.put(EruptMutualConst.ERUPT, eruptName);
             headers.put(EruptMutualConst.TOKEN, request.getHeader(EruptMutualConst.TOKEN));
             headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
-
-            MetaNode.Location location = metaNode.getLocations()
-                    .toArray(new MetaNode.Location[0])[metaNode.getCount() % metaNode.getLocations().size()];
+            String location = metaNode.getLocations().toArray(new String[0])[metaNode.getCount() % metaNode.getLocations().size()];
             HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()),
-                            "https://www.erupt.xyz" + metaNode.getContextPath() + request.getRequestURI())
+                    "https://www.erupt.xyz" + metaNode.getContextPath() + request.getRequestURI())
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
                     .addHeaders(headers).header("token", "VsEjtBmUackiH3cY").execute();
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));

@@ -21,7 +21,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = "app_name"))
+@Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = "node_name"))
 @Erupt(name = "节点管理")
 public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode> {
 
@@ -31,7 +31,7 @@ public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode
             views = @View(title = "服务名", sortable = true),
             edit = @Edit(title = "服务名", notNull = true, search = @Search(vague = true))
     )
-    private String appName;
+    private String nodeName;
 
     @EruptField(
             views = @View(title = "名称", sortable = true),

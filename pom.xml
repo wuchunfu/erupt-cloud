@@ -19,9 +19,9 @@
     </properties>
 
     <modules>
-        <module>erupt-server</module>
-        <module>erupt-node</module>
-        <module>erupt-common</module>
+        <module>erupt-cloud-server</module>
+        <module>erupt-cloud-node</module>
+        <module>erupt-cloud-common</module>
     </modules>
 
     <dependencies>

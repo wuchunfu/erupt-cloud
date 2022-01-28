@@ -1,17 +1,14 @@
 package xyz.erupt.cloud.server.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.base.R;
 import xyz.erupt.cloud.server.model.CloudNode;
-import xyz.erupt.cloud.server.service.EruptMicroservice;
-import xyz.erupt.jpa.dao.EruptDao;
-
-import java.util.HashMap;
+import xyz.erupt.cloud.server.service.EruptNodeMicroservice;
+import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 
 /**
  * 客户端注册控制器
@@ -23,23 +20,22 @@ import java.util.HashMap;
 @AllArgsConstructor
 public class EruptMicroserviceController {
 
-    private final EruptDao eruptDao;
+    private final EruptNodeMicroservice eruptNodeMicroservice;
 
-    private final EruptMicroservice eruptMicroservice;
-
-    @RequestMapping("/register-node/{appName}")
-    public R registerNode(@PathVariable("appName") final String appName, @RequestBody final MetaNode metaNode) {
-        CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.APP_NAME + " = :" + CloudNode.APP_NAME, new HashMap<String, Object>() {{
-            this.put(CloudNode.APP_NAME, appName);
-        }});
-        if (null == cloudNode) return R.error(appName + " not found");
-        if (!cloudNode.getStatus()) return R.error(cloudNode.getName() + " prohibiting the registration");
-        if (!cloudNode.getAccessToken().equals(metaNode.getAccessToken())) {
-            return R.error(cloudNode.getAppName() + " Access token invalid");
+    @RequestMapping("/register-node")
+    public R registerNode(@RequestBody final MetaNode metaNode) {
+        CloudNode cloudNode = eruptNodeMicroservice.findNodeByAppName(metaNode.getNodeName(), metaNode.getAccessToken());
+        if (!cloudNode.getStatus()) {
+            throw new EruptWebApiRuntimeException(cloudNode.getName() + " prohibiting the registration");
         }
-        metaNode.setNodeName(appName);
-        eruptMicroservice.registerNode(metaNode);
+        eruptNodeMicroservice.registerNode(metaNode);
         return R.success();
+    }
+
+    @RequestMapping("/remove-node")
+    public R removeNode(String nodeName, String accessToken) {
+        eruptNodeMicroservice.removeNode(nodeName, accessToken);
+        return R.success(null);
     }
 
 }
