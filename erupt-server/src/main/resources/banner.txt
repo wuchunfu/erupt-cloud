@@ -11,3 +11,4 @@ ${AnsiColor.BRIGHT_YELLOW}
 
 :: Spring Boot     ::  v(${spring-boot.version})
 :: Erupt Framework ::  v(${project.version})
+:: Erupt Cloud     ::  v(${project.version}) ${AnsiColor.DEFAULT}

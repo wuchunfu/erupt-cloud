@@ -34,11 +34,11 @@ public class EruptMicroservice {
     private HttpServletRequest request;
 
     public void registerNode(MetaNode metaNode) {
-        Optional.ofNullable(metaNodeMap.get(metaNode.getNodeCode())).ifPresent(it ->
+        Optional.ofNullable(metaNodeMap.get(metaNode.getNodeName())).ifPresent(it ->
                 metaNode.getLocations().addAll(it.getLocations()));
         metaNode.getLocations().add(new MetaNode.Location(IpUtil.getIpAddr(request), request.getRemotePort()));
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
-        metaNodeMap.put(metaNode.getNodeCode(), metaNode);
+        metaNodeMap.put(metaNode.getNodeName(), metaNode);
     }
 
 }

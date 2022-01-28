@@ -37,7 +37,7 @@ public class EruptMicroserviceController {
         if (!cloudNode.getAccessToken().equals(metaNode.getAccessToken())) {
             return R.error(cloudNode.getAppName() + " Access token invalid");
         }
-        metaNode.setNodeCode(appName);
+        metaNode.setNodeName(appName);
         eruptMicroservice.registerNode(metaNode);
         return R.success();
     }

@@ -19,8 +19,8 @@ public class MetaNode {
     //访问令牌
     private String accessToken;
 
-    //节点编码
-    private String nodeCode;
+    //节点名
+    private String nodeName;
 
     //应用上下文
     private String contextPath;

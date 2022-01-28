@@ -6,6 +6,7 @@ import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.Watcher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
+import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 
 /**
@@ -27,8 +28,9 @@ public class ZkService implements CommandLineRunner {
         zkClient = new ZkClient(String.join(",", eruptCloudServerProp.getZkServers()), 20000);
     }
 
-    public void putName() {
-
+    //向zk推送节点信息
+    public void putNode(MetaNode metaNode) {
+        zkClient.createPersistent(ERUPT_NODE + "/" + metaNode.getNodeName(), metaNode);
     }
 
     @Override
