@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class EruptNodeProp {
 
     //接入应用名称，用于分组隔离，推荐填写 本 Java 项目名称
-    private String appName;
+    private String nodeName;
 
     //客户端秘钥（在服务端界面生成）
     private String accessToken;
@@ -25,6 +25,6 @@ public class EruptNodeProp {
     private String[] serverAddresses;
 
     //心跳时间(毫秒)
-    private int heartbeatTime = 30 * 1000;
+    private int heartbeatTime = 15 * 1000;
 
 }

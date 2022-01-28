@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 
+import javax.annotation.Resource;
+
 /**
  * @author YuePeng
  * date 2022/1/28
@@ -19,14 +21,10 @@ public class ZkService implements CommandLineRunner {
 
     public static final String ERUPT_NODE = "/erupt-node";
 
-    private final EruptCloudServerProp eruptCloudServerProp;
+    @Resource
+    private EruptCloudServerProp eruptCloudServerProp;
 
-    private final ZkClient zkClient;
-
-    public ZkService(EruptCloudServerProp eruptCloudServerProp) {
-        this.eruptCloudServerProp = eruptCloudServerProp;
-        zkClient = new ZkClient(String.join(",", eruptCloudServerProp.getZkServers()), 20000);
-    }
+    private ZkClient zkClient;
 
     //向zk推送节点信息
     public void putNode(MetaNode metaNode) {
@@ -39,10 +37,11 @@ public class ZkService implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (eruptCloudServerProp.getZkServers().size() <= 0) {
+        if (null == eruptCloudServerProp.getZkServers() || eruptCloudServerProp.getZkServers().size() <= 0) {
             log.info("Not configured zookeeper cluster");
             return;
         }
+        zkClient = new ZkClient(String.join(",", eruptCloudServerProp.getZkServers()), 20000);
         zkClient.createEphemeral(ERUPT_NODE);
         zkClient.subscribeChildChanges(ERUPT_NODE, (path, list) -> list.forEach(it -> {
             log.info(path);

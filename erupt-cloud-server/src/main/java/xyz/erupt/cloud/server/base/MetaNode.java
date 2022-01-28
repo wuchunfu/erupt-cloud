@@ -2,6 +2,7 @@ package xyz.erupt.cloud.server.base;
 
 import lombok.Getter;
 import lombok.Setter;
+import xyz.erupt.cloud.common.model.NodeInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,21 +15,9 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class MetaNode {
-
-    //节点名
-    private String nodeName;
-
-    //访问令牌
-    private String accessToken;
-
-    //应用上下文
-    private String contextPath;
+public class MetaNode extends NodeInfo {
 
     private String nodeAddress;
-
-    //服务所管理的erupt清单
-    private Set<String> erupts = new HashSet<>();
 
     //服务地址
     private transient Set<String> locations = new HashSet<>();
@@ -43,21 +32,4 @@ public class MetaNode {
         return ++count;
     }
 
-    @Getter
-    @Setter
-    public static class Location {
-
-        public Location(String ip, int port) {
-            this.ip = ip;
-            this.port = port;
-        }
-
-        public Location() {
-        }
-
-        public String ip;
-
-        public int port;
-
-    }
 }
