@@ -22,7 +22,7 @@ import javax.persistence.UniqueConstraint;
 @Getter
 @Setter
 @Entity
-@Table(name = "e_cloud_client_group", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
+@Table(name = "e_cloud_node_group", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
 @Erupt(name = "服务组别")
 public class CloudGroup extends MetaModel {
 

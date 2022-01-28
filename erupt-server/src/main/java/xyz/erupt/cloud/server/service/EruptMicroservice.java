@@ -1,7 +1,7 @@
 package xyz.erupt.cloud.server.service;
 
 import org.springframework.stereotype.Service;
-import xyz.erupt.cloud.server.base.MetaClient;
+import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.upms.util.IpUtil;
 
 import javax.annotation.Resource;
@@ -17,26 +17,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class EruptMicroservice {
 
-    private static final Map<String, MetaClient> metaClientMap = new ConcurrentHashMap<>();
+    @Resource
+    private ZkService zkService;
 
-    public static int getMetaClientNum() {
-        return metaClientMap.size();
+    private static final Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
+
+    public static int getMetaNodeNum() {
+        return metaNodeMap.size();
     }
 
-    public static MetaClient getMetaClient(String appName) {
-        return metaClientMap.get(appName);
+    public static MetaNode getMetaNode(String appName) {
+        return metaNodeMap.get(appName);
     }
 
     @Resource
     private HttpServletRequest request;
 
-    public void registerClient(MetaClient metaClient) {
-        Optional.ofNullable(metaClientMap.get(metaClient.getClientCode())).ifPresent(it ->
-                metaClient.getLocations().addAll(it.getLocations()));
-        metaClient.getLocations().add(new MetaClient.Location(IpUtil.getIpAddr(request), request.getRemotePort()));
-        metaClient.getErupts().forEach(it -> metaClient.getEruptMap().put(it, it));
-        metaClientMap.put(metaClient.getClientCode(), metaClient);
+    public void registerNode(MetaNode metaNode) {
+        Optional.ofNullable(metaNodeMap.get(metaNode.getNodeCode())).ifPresent(it ->
+                metaNode.getLocations().addAll(it.getLocations()));
+        metaNode.getLocations().add(new MetaNode.Location(IpUtil.getIpAddr(request), request.getRemotePort()));
+        metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
+        metaNodeMap.put(metaNode.getNodeCode(), metaNode);
     }
-
 
 }

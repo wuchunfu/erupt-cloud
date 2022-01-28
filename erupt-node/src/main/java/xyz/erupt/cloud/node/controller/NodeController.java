@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.client.controller;
+package xyz.erupt.cloud.node.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,7 +10,7 @@ import xyz.erupt.core.constant.EruptRestPath;
  */
 @RestController
 @RequestMapping(EruptRestPath.ERUPT_API + "/health")
-public class ClientController {
+public class NodeController {
 
 
 }

@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.erupt.cloud.server.base.MetaClient;
+import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.base.R;
-import xyz.erupt.cloud.server.model.CloudClient;
+import xyz.erupt.cloud.server.model.CloudNode;
 import xyz.erupt.cloud.server.service.EruptMicroservice;
 import xyz.erupt.jpa.dao.EruptDao;
 
@@ -27,18 +27,18 @@ public class EruptMicroserviceController {
 
     private final EruptMicroservice eruptMicroservice;
 
-    @RequestMapping("/register-client/{appName}")
-    public R registerClient(@PathVariable("appName") final String appName, @RequestBody final MetaClient metaClient) {
-        CloudClient cloudClient = eruptDao.queryEntity(CloudClient.class, CloudClient.APP_NAME + " = :" + CloudClient.APP_NAME, new HashMap<String, Object>() {{
-            this.put(CloudClient.APP_NAME, appName);
+    @RequestMapping("/register-node/{appName}")
+    public R registerNode(@PathVariable("appName") final String appName, @RequestBody final MetaNode metaNode) {
+        CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.APP_NAME + " = :" + CloudNode.APP_NAME, new HashMap<String, Object>() {{
+            this.put(CloudNode.APP_NAME, appName);
         }});
-        if (null == cloudClient) return R.error(appName + " not found");
-        if (!cloudClient.getStatus()) return R.error(cloudClient.getName() + " prohibiting the registration");
-        if (!cloudClient.getAccessToken().equals(metaClient.getAccessToken())) {
-            return R.error(cloudClient.getAppName() + " Access token invalid");
+        if (null == cloudNode) return R.error(appName + " not found");
+        if (!cloudNode.getStatus()) return R.error(cloudNode.getName() + " prohibiting the registration");
+        if (!cloudNode.getAccessToken().equals(metaNode.getAccessToken())) {
+            return R.error(cloudNode.getAppName() + " Access token invalid");
         }
-        metaClient.setClientCode(appName);
-        eruptMicroservice.registerClient(metaClient);
+        metaNode.setNodeCode(appName);
+        eruptMicroservice.registerNode(metaNode);
         return R.success();
     }
 

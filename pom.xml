@@ -20,7 +20,7 @@
 
     <modules>
         <module>erupt-server</module>
-        <module>erupt-client</module>
+        <module>erupt-node</module>
         <module>erupt-common</module>
     </modules>
 

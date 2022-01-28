@@ -1,9 +1,9 @@
-package xyz.erupt.cloud.client;
+package xyz.erupt.cloud.node;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import xyz.erupt.cloud.client.config.EruptClientProp;
+import xyz.erupt.cloud.node.config.EruptNodeProp;
 
 /**
  * @author YuePeng
@@ -11,6 +11,6 @@ import xyz.erupt.cloud.client.config.EruptClientProp;
  */
 @Configuration
 @ComponentScan
-@EnableConfigurationProperties(EruptClientProp.class)
-public class EruptCloudClientAutoConfiguration {
+@EnableConfigurationProperties(EruptNodeProp.class)
+public class EruptCloudNodeAutoConfiguration {
 }

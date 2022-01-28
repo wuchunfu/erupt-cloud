@@ -14,13 +14,13 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class MetaClient {
+public class MetaNode {
 
     //访问令牌
     private String accessToken;
 
-    //应用编码
-    private String clientCode;
+    //节点编码
+    private String nodeCode;
 
     //应用上下文
     private String contextPath;

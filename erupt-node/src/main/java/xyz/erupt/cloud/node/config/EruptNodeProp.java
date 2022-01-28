@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.client.config;
+package xyz.erupt.cloud.node.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("erupt-cloud.client")
-public class EruptClientProp {
+@ConfigurationProperties("erupt-cloud.node")
+public class EruptNodeProp {
 
     //接入应用名称，用于分组隔离，推荐填写 本 Java 项目名称
     private String appName;
@@ -24,5 +24,7 @@ public class EruptClientProp {
     //服务端地址（支持集群）
     private String[] serverAddresses;
 
+    //心跳时间(毫秒)
+    private int heartbeatTime = 30 * 1000;
 
 }

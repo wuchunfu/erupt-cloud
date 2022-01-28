@@ -21,9 +21,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "e_cloud_client", uniqueConstraints = @UniqueConstraint(columnNames = "app_name"))
-@Erupt(name = "服务管理")
-public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudClient> {
+@Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = "app_name"))
+@Erupt(name = "节点管理")
+public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode> {
 
     public static final String APP_NAME = "appName";
 
@@ -80,7 +80,7 @@ public class CloudClient extends HyperModelUpdateVo implements DataProxy<CloudCl
     private String remark;
 
     @Override
-    public void beforeAdd(CloudClient cloudClient) {
-        cloudClient.setAccessToken(Erupts.generateCode(16));
+    public void beforeAdd(CloudNode cloudNode) {
+        cloudNode.setAccessToken(Erupts.generateCode(16));
     }
 }
