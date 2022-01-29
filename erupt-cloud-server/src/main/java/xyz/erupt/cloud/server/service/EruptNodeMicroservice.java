@@ -32,8 +32,8 @@ public class EruptNodeMicroservice {
     private HttpServletRequest request;
 
     public CloudNode findNodeByAppName(String appName, String accessToken) {
-        CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.APP_NAME + " = :" + CloudNode.APP_NAME, new HashMap<String, Object>() {{
-            this.put(CloudNode.APP_NAME, appName);
+        CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.NODE_NAME + " = :" + CloudNode.NODE_NAME, new HashMap<String, Object>() {{
+            this.put(CloudNode.NODE_NAME, appName);
         }});
         if (null == cloudNode) {
             throw new EruptWebApiRuntimeException(appName + " not found");

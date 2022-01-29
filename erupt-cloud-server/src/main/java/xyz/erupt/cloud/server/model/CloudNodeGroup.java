@@ -24,7 +24,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name = "e_cloud_node_group", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
 @Erupt(name = "服务组别")
-public class CloudGroup extends MetaModel {
+public class CloudNodeGroup extends MetaModel {
 
     @EruptField(
             views = @View(title = "编码", sortable = true),

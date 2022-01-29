@@ -9,10 +9,14 @@ import xyz.erupt.annotation.fun.DataProxy;
 import xyz.erupt.annotation.sub_field.*;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
+import xyz.erupt.cloud.server.base.MetaNode;
+import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.util.Erupts;
 import xyz.erupt.upms.helper.HyperModelUpdateVo;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author YuePeng
@@ -25,11 +29,11 @@ import javax.persistence.*;
 @Erupt(name = "节点管理")
 public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode> {
 
-    public static final String APP_NAME = "appName";
+    public static final String NODE_NAME = "nodeName";
 
     @EruptField(
-            views = @View(title = "服务名", sortable = true),
-            edit = @Edit(title = "服务名", notNull = true, search = @Search(vague = true))
+            views = @View(title = "节点名", sortable = true),
+            edit = @Edit(title = "节点名", desc = "NodeName", notNull = true, search = @Search(vague = true))
     )
     private String nodeName;
 
@@ -82,5 +86,18 @@ public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode
     @Override
     public void beforeAdd(CloudNode cloudNode) {
         cloudNode.setAccessToken(Erupts.generateCode(16));
+    }
+
+    @Override
+    public void afterFetch(Collection<Map<String, Object>> list) {
+        for (Map<String, Object> map : list) {
+            MetaNode metaNode = NodeManager.getNode(NODE_NAME);
+            if (null == metaNode) {
+                map.put("instanceNum", 0);
+            } else {
+                map.put("eruptNum", metaNode.getErupts().size());
+                map.put("instanceNum", metaNode.getLocations().size());
+            }
+        }
     }
 }
