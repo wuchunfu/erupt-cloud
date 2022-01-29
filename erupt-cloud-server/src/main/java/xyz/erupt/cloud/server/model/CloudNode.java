@@ -12,7 +12,7 @@ import xyz.erupt.annotation.sub_field.sub_edit.Search;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.util.Erupts;
-import xyz.erupt.upms.helper.HyperModelUpdateVo;
+import xyz.erupt.jpa.model.MetaModelUpdateVo;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Entity
 @Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = CloudNode.NODE_NAME))
 @Erupt(name = "节点管理", dataProxy = CloudNode.class)
-public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode> {
+public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode> {
 
     public static final String NODE_NAME = "nodeName";
 
