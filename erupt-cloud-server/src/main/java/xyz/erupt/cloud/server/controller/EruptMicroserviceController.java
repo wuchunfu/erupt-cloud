@@ -34,9 +34,8 @@ public class EruptMicroserviceController {
     }
 
     @RequestMapping(ServerApiConst.REMOVE_NODE)
-    public R removeNode(String nodeName, String accessToken) {
+    public void removeNode(String nodeName, String accessToken) {
         eruptNodeMicroservice.removeNode(nodeName, accessToken);
-        return R.success(null);
     }
 
 }

@@ -3,6 +3,7 @@ package xyz.erupt.cloud.server.service;
 import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.model.CloudNode;
+import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 import xyz.erupt.jpa.dao.EruptDao;
 import xyz.erupt.upms.util.IpUtil;
@@ -27,16 +28,6 @@ public class EruptNodeMicroservice {
     @Resource
     private EruptDao eruptDao;
 
-    private static final Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
-
-    public static int getMetaNodeNum() {
-        return metaNodeMap.size();
-    }
-
-    public static MetaNode getMetaNode(String appName) {
-        return metaNodeMap.get(appName);
-    }
-
     @Resource
     private HttpServletRequest request;
 
@@ -54,14 +45,14 @@ public class EruptNodeMicroservice {
     }
 
     public void registerNode(MetaNode metaNode) {
-        Optional.ofNullable(metaNodeMap.get(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
+        Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
         metaNode.getLocations().add(IpUtil.getIpAddr(request) + request.getRemotePort());
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
-        metaNodeMap.put(metaNode.getNodeName(), metaNode);
+        zkService.putNode(metaNode);
     }
 
     public void removeNode(String nodeName, String accessToken) {
         CloudNode cloudNode = this.findNodeByAppName(nodeName, accessToken);
-        zkService.remove(metaNodeMap.remove(cloudNode.getNodeName()));
+        zkService.remove(NodeManager.getNode(cloudNode.getName()));
     }
 }
