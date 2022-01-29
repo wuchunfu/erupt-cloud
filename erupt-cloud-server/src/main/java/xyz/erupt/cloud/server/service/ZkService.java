@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
-import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -38,13 +37,15 @@ public class ZkService implements CommandLineRunner {
 
     //向zk推送节点信息
     public void putNode(MetaNode metaNode) {
-        NodeManager.putNode(metaNode);
-        zkClient.createEphemeral(ERUPT_NODE + "/" + metaNode.getNodeName(), metaNode);
+        String node = ERUPT_NODE + "/" + metaNode.getNodeName();
+        if (!zkClient.exists(node)) {
+            zkClient.createEphemeral(node, gson.toJson(metaNode));
+        }
     }
 
     //移除节点
     public void remove(MetaNode metaNode) {
-        if (metaNode.getLocations().size() == 1) {
+        if (null == metaNode.getLocations() || metaNode.getLocations().size() == 1) {
             NodeManager.removeNode(metaNode.getNodeName());
             zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
         } else {
@@ -60,18 +61,18 @@ public class ZkService implements CommandLineRunner {
             return;
         }
         zkClient = new ZkClient(String.join(",", eruptCloudServerProp.getZkServers()), 20000);
-        zkClient.createEphemeral(ERUPT_NODE);
-        zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> list.forEach(it -> {
-            log.info(parent);
-            log.info("parent:" + parent + "/" + ERUPT_NODE + ":children:" + it);
-            String data = zkClient.readData(ERUPT_NODE + it);
-            log.info(data);
-            if (null == data) {
-                NodeManager.removeNode(ERUPT_NODE + it);
-            } else {
-                NodeManager.putNode(gson.fromJson(data, MetaNode.class));
+        if (!zkClient.exists(ERUPT_NODE)) {
+            zkClient.createPersistent(ERUPT_NODE);
+        }
+        zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> {
+            NodeManager.clearNodeMap();
+            if (null != list) {
+                list.forEach(it -> {
+                    String data = zkClient.readData(ERUPT_NODE + "/" + it);
+                    NodeManager.putNode(gson.fromJson(data, MetaNode.class));
+                });
             }
-        }));
+        });
         // 监听状态变化
         zkClient.subscribeStateChanges(new IZkStateListener() {
             @Override
@@ -81,7 +82,7 @@ public class ZkService implements CommandLineRunner {
 
             @Override
             public void handleNewSession() {
-                System.out.println("new session");
+
             }
 
             @Override

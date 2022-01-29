@@ -3,6 +3,7 @@ package xyz.erupt.cloud.common.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class NodeInfo {
+public class NodeInfo implements Serializable {
 
     //节点名
     private String nodeName;
@@ -24,6 +25,8 @@ public class NodeInfo {
 
     //应用上下文
     private String contextPath;
+
+    private String version;
 
     //服务所管理的erupt清单
     private List<String> erupts = new ArrayList<>();

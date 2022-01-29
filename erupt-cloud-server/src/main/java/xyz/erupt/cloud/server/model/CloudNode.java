@@ -25,8 +25,8 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = "node_name"))
-@Erupt(name = "节点管理")
+@Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = CloudNode.NODE_NAME))
+@Erupt(name = "节点管理", dataProxy = CloudNode.class)
 public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode> {
 
     public static final String NODE_NAME = "nodeName";
@@ -44,18 +44,18 @@ public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode
     private String name;
 
     @EruptField(
-            views = @View(title = "Access Token", sortable = true, type = ViewType.HTML),
-            edit = @Edit(title = "Access Token", readonly = @Readonly, search = @Search)
+            views = @View(title = "Access Token", width = "170px"),
+            edit = @Edit(title = "Access Token", readonly = @Readonly, search = @Search, show = false)
     )
     private String accessToken;
 
     @EruptField(
-            views = @View(title = "状态", sortable = true, type = ViewType.HTML),
-            edit = @Edit(title = "状态", notNull = true, boolType = @BoolType(
+            views = @View(title = "状态", sortable = true),
+            edit = @Edit(title = "状态", search = @Search, notNull = true, boolType = @BoolType(
                     trueText = "启用", falseText = "禁用"
             ))
     )
-    private Boolean status;
+    private Boolean status = true;
 
     @EruptField(
             views = @View(title = "负责人", sortable = true),
@@ -65,13 +65,13 @@ public class CloudNode extends HyperModelUpdateVo implements DataProxy<CloudNode
 
     @Transient
     @EruptField(
-            views = @View(title = "Erupt类数量", sortable = true, type = ViewType.HTML)
+            views = @View(title = "Erupt类数量", type = ViewType.HTML)
     )
     private String eruptNum;
 
     @Transient
     @EruptField(
-            views = @View(title = "实例数量", sortable = true, type = ViewType.HTML)
+            views = @View(title = "实例数量", type = ViewType.HTML)
     )
     private String instanceNum;
 

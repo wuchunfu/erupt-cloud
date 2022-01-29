@@ -41,7 +41,7 @@ public class CloudNodeGroup extends MetaModel {
     @Lob
     @EruptField(
             views = @View(title = "描述"),
-            edit = @Edit(title = "描述",type = EditType.HTML_EDITOR, search = @Search(vague = true))
+            edit = @Edit(title = "描述",type = EditType.HTML_EDITOR)
     )
     private String remark;
 

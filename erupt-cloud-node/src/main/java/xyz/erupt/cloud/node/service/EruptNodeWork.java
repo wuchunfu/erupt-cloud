@@ -1,6 +1,6 @@
 package xyz.erupt.cloud.node.service;
 
-import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.google.gson.Gson;
@@ -16,6 +16,7 @@ import xyz.erupt.cloud.common.model.NodeInfo;
 import xyz.erupt.cloud.node.config.EruptNodeProp;
 import xyz.erupt.core.config.GsonFactory;
 import xyz.erupt.core.service.EruptCoreService;
+import xyz.erupt.core.util.EruptInformation;
 import xyz.erupt.core.view.EruptModel;
 
 import javax.annotation.Resource;
@@ -44,7 +45,7 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
     @Override
     public void run(ApplicationArguments args) {
         Thread register = new Thread(this);
-        register.setName("node-register");
+        register.setName("erupt-node-register");
         register.setDaemon(true);
         register.start();
     }
@@ -55,10 +56,17 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
         if (null == eruptNodeProp.getServerAddresses() || eruptNodeProp.getServerAddresses().length <= 0) {
             throw new RuntimeException("erupt-cloud.node.serverAddresses not config");
         }
+        if (null == eruptNodeProp.getNodeName()) {
+            throw new RuntimeException("erupt-cloud.node.nodeName not config");
+        }
+        if (null == eruptNodeProp.getAccessToken()) {
+            throw new RuntimeException("erupt-cloud.node.accessToken not config");
+        }
         while (this.runner) {
             NodeInfo nodeInfo = new NodeInfo();
             nodeInfo.setNodeName(eruptNodeProp.getNodeName());
             nodeInfo.setAccessToken(eruptNodeProp.getAccessToken());
+            nodeInfo.setVersion(EruptInformation.getEruptVersion());
             nodeInfo.setContextPath(serverProperties.getServlet().getContextPath());
             nodeInfo.setErupts(EruptCoreService.getErupts().stream().map(EruptModel::getEruptName).collect(Collectors.toList()));
             String address = eruptNodeProp.getServerAddresses()[count++ % eruptNodeProp.getServerAddresses().length];
@@ -69,8 +77,8 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
                     log.error(httpResponse.body());
                 }
                 TimeUnit.MILLISECONDS.sleep(eruptNodeProp.getHeartbeatTime());
-            } catch (IORuntimeException e) {
-                log.error("{}: Connection refused (Connection refused)", address);
+            } catch (HttpException e) {
+                log.error("{}: ", e.getMessage());
                 TimeUnit.SECONDS.sleep(5);
             }
         }

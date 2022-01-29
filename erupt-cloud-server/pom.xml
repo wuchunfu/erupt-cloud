@@ -22,22 +22,17 @@
         <dependency>
             <groupId>xyz.erupt.cloud</groupId>
             <artifactId>erupt-cloud-common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>xyz.erupt</groupId>
             <artifactId>erupt-upms</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>xyz.erupt</groupId>
             <artifactId>erupt-tpl</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>xyz.erupt</groupId>
-            <artifactId>erupt-tpl-ui.element-ui</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>

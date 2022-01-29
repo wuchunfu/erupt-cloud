@@ -32,4 +32,9 @@ public class NodeManager {
         metaNodeMap.remove(nodeName);
     }
 
+    //清空节点
+    public static void clearNodeMap() {
+        metaNodeMap.clear();
+    }
+
 }

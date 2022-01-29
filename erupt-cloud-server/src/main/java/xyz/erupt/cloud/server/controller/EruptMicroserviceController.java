@@ -3,6 +3,7 @@ package xyz.erupt.cloud.server.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.erupt.cloud.common.consts.ServerApiConst;
 import xyz.erupt.cloud.server.base.MetaNode;
@@ -27,14 +28,14 @@ public class EruptMicroserviceController {
     public R registerNode(@RequestBody MetaNode metaNode) {
         CloudNode cloudNode = eruptNodeMicroservice.findNodeByAppName(metaNode.getNodeName(), metaNode.getAccessToken());
         if (!cloudNode.getStatus()) {
-            throw new EruptWebApiRuntimeException(cloudNode.getName() + " prohibiting the registration");
+            throw new EruptWebApiRuntimeException(metaNode.getNodeName() + " prohibiting the registration");
         }
         eruptNodeMicroservice.registerNode(metaNode);
         return R.success();
     }
 
     @RequestMapping(ServerApiConst.REMOVE_NODE)
-    public void removeNode(String nodeName, String accessToken) {
+    public void removeNode(@RequestParam  String nodeName,@RequestParam  String accessToken) {
         eruptNodeMicroservice.removeNode(nodeName, accessToken);
     }
 

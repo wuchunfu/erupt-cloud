@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import xyz.erupt.cloud.common.model.NodeInfo;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class MetaNode extends NodeInfo {
+public class MetaNode extends NodeInfo implements Serializable {
 
     private String nodeAddress;
 

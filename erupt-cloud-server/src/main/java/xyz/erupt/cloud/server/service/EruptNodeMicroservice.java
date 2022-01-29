@@ -4,16 +4,13 @@ import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.model.CloudNode;
 import xyz.erupt.cloud.server.node.NodeManager;
-import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 import xyz.erupt.jpa.dao.EruptDao;
 import xyz.erupt.upms.util.IpUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author YuePeng
@@ -31,15 +28,15 @@ public class EruptNodeMicroservice {
     @Resource
     private HttpServletRequest request;
 
-    public CloudNode findNodeByAppName(String appName, String accessToken) {
+    public CloudNode findNodeByAppName(String nodeName, String accessToken) {
         CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.NODE_NAME + " = :" + CloudNode.NODE_NAME, new HashMap<String, Object>() {{
-            this.put(CloudNode.NODE_NAME, appName);
+            this.put(CloudNode.NODE_NAME, nodeName);
         }});
         if (null == cloudNode) {
-            throw new EruptWebApiRuntimeException(appName + " not found");
+            throw new RuntimeException(nodeName + " not found");
         }
         if (!cloudNode.getAccessToken().equals(accessToken)) {
-            throw new EruptWebApiRuntimeException(cloudNode.getNodeName() + " Access token invalid");
+            throw new RuntimeException(cloudNode.getNodeName() + " Access token invalid");
         }
         return cloudNode;
     }
@@ -51,8 +48,8 @@ public class EruptNodeMicroservice {
         zkService.putNode(metaNode);
     }
 
-    public void removeNode(String nodeName, String accessToken) {
-        CloudNode cloudNode = this.findNodeByAppName(nodeName, accessToken);
-        zkService.remove(NodeManager.getNode(cloudNode.getName()));
+    public void removeNode(String nodeName,String accessToken) {
+        this.findNodeByAppName(nodeName, accessToken);
+        zkService.remove(NodeManager.getNode(nodeName));
     }
 }
