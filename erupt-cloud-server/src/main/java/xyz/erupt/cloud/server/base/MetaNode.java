@@ -5,10 +5,7 @@ import lombok.Setter;
 import xyz.erupt.cloud.common.model.NodeInfo;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author YuePeng
@@ -18,8 +15,11 @@ import java.util.Set;
 @Setter
 public class MetaNode extends NodeInfo implements Serializable {
 
+    //服务注册时间
+    private Date registerTime;
+
     //服务地址
-    private transient Set<String> locations = new HashSet<>();
+    private Set<String> locations = new HashSet<>();
 
     //由erupts转换而来
     private transient Map<String, String> eruptMap = new HashMap<>();

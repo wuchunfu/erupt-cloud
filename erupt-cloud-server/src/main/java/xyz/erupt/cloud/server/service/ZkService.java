@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 import xyz.erupt.cloud.server.node.NodeManager;
+import xyz.erupt.cloud.server.node.NodeWork;
 import xyz.erupt.core.config.GsonFactory;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.Executors;
 
 /**
  * @author YuePeng
@@ -33,6 +35,9 @@ public class ZkService implements CommandLineRunner {
     @Resource
     private HttpServletRequest request;
 
+    @Resource
+    private NodeWork nodeWork;
+
     private ZkClient zkClient;
 
     //向zk推送节点信息
@@ -42,7 +47,7 @@ public class ZkService implements CommandLineRunner {
         if (zkClient.exists(node)) {
             zkClient.writeData(node, metaNodeJson);
         } else {
-            zkClient.createEphemeral(node, metaNodeJson);
+            zkClient.createPersistent(node, metaNodeJson);
         }
     }
 
@@ -67,6 +72,8 @@ public class ZkService implements CommandLineRunner {
         if (!zkClient.exists(ERUPT_NODE)) {
             zkClient.createPersistent(ERUPT_NODE);
         }
+        //节点处理任务
+        Executors.newSingleThreadExecutor().execute(nodeWork);
         zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> {
             if (null == list) {
                 NodeManager.clearNodes();

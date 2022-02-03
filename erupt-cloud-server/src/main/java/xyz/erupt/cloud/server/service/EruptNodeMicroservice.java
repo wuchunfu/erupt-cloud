@@ -9,6 +9,7 @@ import xyz.erupt.upms.util.IpUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -45,6 +46,7 @@ public class EruptNodeMicroservice {
         Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
         metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + request.getRemotePort());
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
+        metaNode.setRegisterTime(new Date());
         zkService.putNode(metaNode);
     }
 
