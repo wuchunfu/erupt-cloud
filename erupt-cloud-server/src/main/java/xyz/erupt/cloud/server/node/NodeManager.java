@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NodeManager {
 
-    private static final Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
+    private static Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
 
     public static int getMetaNodeNum() {
         return metaNodeMap.size();

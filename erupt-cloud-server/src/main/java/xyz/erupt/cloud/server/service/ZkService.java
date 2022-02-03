@@ -65,12 +65,13 @@ public class ZkService implements CommandLineRunner {
             zkClient.createPersistent(ERUPT_NODE);
         }
         zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> {
-            NodeManager.clearNodeMap();
-            if (null != list) {
-                list.forEach(it -> {
+            if (null == list) {
+                NodeManager.clearNodeMap();
+            } else {
+                for (String it : list) {
                     String data = zkClient.readData(ERUPT_NODE + "/" + it);
                     NodeManager.putNode(gson.fromJson(data, MetaNode.class));
-                });
+                }
             }
         });
         // 监听状态变化

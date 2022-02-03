@@ -17,6 +17,9 @@ import java.util.List;
 @Setter
 public class NodeInfo implements Serializable {
 
+    //版本
+    private String version;
+
     //节点名
     private String nodeName;
 
@@ -25,8 +28,6 @@ public class NodeInfo implements Serializable {
 
     //应用上下文
     private String contextPath;
-
-    private String version;
 
     //服务所管理的erupt清单
     private List<String> erupts = new ArrayList<>();

@@ -18,8 +18,6 @@ import java.util.Set;
 @Setter
 public class MetaNode extends NodeInfo implements Serializable {
 
-    private String nodeAddress;
-
     //服务地址
     private transient Set<String> locations = new HashSet<>();
 

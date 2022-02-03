@@ -11,7 +11,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Component;
-import xyz.erupt.cloud.common.consts.ServerApiConst;
+import xyz.erupt.cloud.common.consts.ServerRestApiConst;
 import xyz.erupt.cloud.common.model.NodeInfo;
 import xyz.erupt.cloud.node.config.EruptNodeProp;
 import xyz.erupt.core.config.GsonFactory;
@@ -35,9 +35,11 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
     @Resource
     private EruptNodeProp eruptNodeProp;
 
-    private final Gson gson = GsonFactory.getGson();
     @Resource
     private ServerProperties serverProperties;
+
+    private final Gson gson = GsonFactory.getGson();
+
     private boolean runner = true;
 
     private int count = 0;
@@ -71,7 +73,7 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
             nodeInfo.setErupts(EruptCoreService.getErupts().stream().map(EruptModel::getEruptName).collect(Collectors.toList()));
             String address = eruptNodeProp.getServerAddresses()[count++ % eruptNodeProp.getServerAddresses().length];
             try {
-                HttpResponse httpResponse = HttpUtil.createPost(address + ServerApiConst.REGISTER_NODE)
+                HttpResponse httpResponse = HttpUtil.createPost(address + ServerRestApiConst.REGISTER_NODE)
                         .body(gson.toJson(nodeInfo)).execute();
                 if (!httpResponse.isOk()) {
                     log.error(httpResponse.body());
@@ -89,7 +91,7 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
         this.runner = false;
         // cancel register
         HttpUtil.createPost(eruptNodeProp.getServerAddresses()
-                [count++ % eruptNodeProp.getServerAddresses().length] + ServerApiConst.REMOVE_NODE
+                [count++ % eruptNodeProp.getServerAddresses().length] + ServerRestApiConst.REMOVE_NODE
         ).form(new HashMap<String, Object>() {{
             this.put("nodeName", eruptNodeProp.getNodeName());
             this.put("accessToken", eruptNodeProp.getAccessToken());
