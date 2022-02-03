@@ -33,7 +33,7 @@ public class NodeManager {
     }
 
     //清空节点
-    public static void clearNodeMap() {
+    public static void clearNodes() {
         metaNodeMap.clear();
     }
 

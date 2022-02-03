@@ -43,12 +43,12 @@ public class EruptNodeMicroservice {
 
     public void registerNode(MetaNode metaNode) {
         Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
-        metaNode.getLocations().add(IpUtil.getIpAddr(request) + request.getRemotePort());
+        metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + request.getRemotePort());
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
         zkService.putNode(metaNode);
     }
 
-    public void removeNode(String nodeName,String accessToken) {
+    public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
         zkService.remove(NodeManager.getNode(nodeName));
     }

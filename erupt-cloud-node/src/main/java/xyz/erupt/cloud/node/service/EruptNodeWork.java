@@ -1,6 +1,5 @@
 package xyz.erupt.cloud.node.service;
 
-import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.google.gson.Gson;
@@ -79,7 +78,7 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
                     log.error(httpResponse.body());
                 }
                 TimeUnit.MILLISECONDS.sleep(eruptNodeProp.getHeartbeatTime());
-            } catch (HttpException e) {
+            } catch (Exception e) {
                 log.error("{}: ", e.getMessage());
                 TimeUnit.SECONDS.sleep(5);
             }

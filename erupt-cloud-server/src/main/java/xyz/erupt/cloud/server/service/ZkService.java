@@ -38,8 +38,11 @@ public class ZkService implements CommandLineRunner {
     //向zk推送节点信息
     public void putNode(MetaNode metaNode) {
         String node = ERUPT_NODE + "/" + metaNode.getNodeName();
-        if (!zkClient.exists(node)) {
-            zkClient.createEphemeral(node, gson.toJson(metaNode));
+        String metaNodeJson = gson.toJson(metaNode);
+        if (zkClient.exists(node)) {
+            zkClient.writeData(node, metaNodeJson);
+        } else {
+            zkClient.createEphemeral(node, metaNodeJson);
         }
     }
 
@@ -57,7 +60,7 @@ public class ZkService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (null == eruptCloudServerProp.getZkServers() || eruptCloudServerProp.getZkServers().size() <= 0) {
-            log.info("Not configured zookeeper cluster");
+            log.error("Not configured zookeeper cluster");
             return;
         }
         zkClient = new ZkClient(String.join(",", eruptCloudServerProp.getZkServers()), 20000);
@@ -66,7 +69,7 @@ public class ZkService implements CommandLineRunner {
         }
         zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> {
             if (null == list) {
-                NodeManager.clearNodeMap();
+                NodeManager.clearNodes();
             } else {
                 for (String it : list) {
                     String data = zkClient.readData(ERUPT_NODE + "/" + it);
