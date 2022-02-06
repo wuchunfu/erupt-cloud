@@ -52,6 +52,13 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     )
     private String accessToken;
 
+    @ManyToOne
+    @EruptField(
+            views = @View(title = "所属分组"),
+            edit = @Edit(title = "所属分组", search = @Search)
+    )
+    private CloudNodeGroup cloudNodeGroup;
+
     @EruptField(
             views = @View(title = "状态", sortable = true),
             edit = @Edit(title = "状态", search = @Search, notNull = true, boolType = @BoolType(
