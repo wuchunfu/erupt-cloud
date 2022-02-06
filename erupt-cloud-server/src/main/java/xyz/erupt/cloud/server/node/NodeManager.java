@@ -12,15 +12,9 @@ import java.util.function.Consumer;
  */
 public class NodeManager {
 
-    private static Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
+    private static final Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
 
     public static void consumerNode(Consumer<MetaNode> consumer) {
-        for (MetaNode value : metaNodeMap.values()) {
-            consumer.accept(value);
-        }
-    }
-
-    public static void removeIf(Consumer<MetaNode> consumer) {
         for (MetaNode value : metaNodeMap.values()) {
             consumer.accept(value);
         }

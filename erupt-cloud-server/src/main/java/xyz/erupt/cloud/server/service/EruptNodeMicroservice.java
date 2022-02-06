@@ -44,7 +44,8 @@ public class EruptNodeMicroservice {
 
     public void registerNode(MetaNode metaNode) {
         Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
-        metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + request.getRemotePort());
+        metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + metaNode.getPort() +
+                (metaNode.getContextPath() == null ? "" : metaNode.getContextPath()));
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
         metaNode.setRegisterTime(new Date());
         zkService.putNode(metaNode);
@@ -54,4 +55,5 @@ public class EruptNodeMicroservice {
         this.findNodeByAppName(nodeName, accessToken);
         zkService.remove(NodeManager.getNode(nodeName));
     }
+
 }

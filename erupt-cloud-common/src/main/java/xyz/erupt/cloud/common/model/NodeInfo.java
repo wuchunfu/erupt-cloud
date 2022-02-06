@@ -20,6 +20,9 @@ public class NodeInfo implements Serializable {
     //版本
     private String version;
 
+    //端口
+    private Integer port;
+
     //节点名
     private String nodeName;
 

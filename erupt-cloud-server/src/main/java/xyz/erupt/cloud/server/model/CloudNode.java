@@ -6,7 +6,10 @@ import org.hibernate.annotations.Type;
 import xyz.erupt.annotation.Erupt;
 import xyz.erupt.annotation.EruptField;
 import xyz.erupt.annotation.fun.DataProxy;
-import xyz.erupt.annotation.sub_field.*;
+import xyz.erupt.annotation.sub_field.Edit;
+import xyz.erupt.annotation.sub_field.EditType;
+import xyz.erupt.annotation.sub_field.Readonly;
+import xyz.erupt.annotation.sub_field.View;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
 import xyz.erupt.cloud.server.base.MetaNode;
@@ -65,15 +68,15 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
 
     @Transient
     @EruptField(
-            views = @View(title = "Erupt类数量", type = ViewType.HTML)
+            views = @View(title = "Erupt 类数量")
     )
-    private String eruptNum;
+    private Integer eruptNum;
 
     @Transient
     @EruptField(
-            views = @View(title = "实例数量", type = ViewType.HTML)
+            views = @View(title = "实例数量")
     )
-    private String instanceNum;
+    private Integer instanceNum;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -91,7 +94,7 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     @Override
     public void afterFetch(Collection<Map<String, Object>> list) {
         for (Map<String, Object> map : list) {
-            MetaNode metaNode = NodeManager.getNode(NODE_NAME);
+            MetaNode metaNode = NodeManager.getNode(map.get(NODE_NAME).toString());
             if (null == metaNode) {
                 map.put("instanceNum", 0);
             } else {

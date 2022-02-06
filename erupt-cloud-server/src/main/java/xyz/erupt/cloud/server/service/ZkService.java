@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 import xyz.erupt.cloud.server.node.NodeManager;
-import xyz.erupt.cloud.server.node.NodeWork;
+import xyz.erupt.cloud.server.node.NodeWorker;
 import xyz.erupt.core.config.GsonFactory;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YuePeng
@@ -35,30 +37,31 @@ public class ZkService implements CommandLineRunner {
     @Resource
     private HttpServletRequest request;
 
-    @Resource
-    private NodeWork nodeWork;
-
     private ZkClient zkClient;
 
     //向zk推送节点信息
     public void putNode(MetaNode metaNode) {
         String node = ERUPT_NODE + "/" + metaNode.getNodeName();
         String metaNodeJson = gson.toJson(metaNode);
-        if (zkClient.exists(node)) {
-            zkClient.writeData(node, metaNodeJson);
-        } else {
-            zkClient.createPersistent(node, metaNodeJson);
-        }
+        Optional.ofNullable(zkClient).ifPresent(it -> {
+            if (zkClient.exists(node)) {
+                zkClient.writeData(node, metaNodeJson);
+            } else {
+                zkClient.createPersistent(node, metaNodeJson);
+            }
+        });
     }
 
     //移除节点
     public void remove(MetaNode metaNode) {
-        if (null == metaNode.getLocations() || metaNode.getLocations().size() == 1) {
-            NodeManager.removeNode(metaNode.getNodeName());
-            zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
-        } else {
-            metaNode.getLocations().removeIf(location -> location.equals(request.getRequestURI()));
-            this.putNode(metaNode);
+        if (null != metaNode) {
+            if (null == metaNode.getLocations() || metaNode.getLocations().size() == 1) {
+                NodeManager.removeNode(metaNode.getNodeName());
+                zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
+            } else {
+                metaNode.getLocations().removeIf(location -> location.equals(request.getRequestURI()));
+                this.putNode(metaNode);
+            }
         }
     }
 
@@ -72,8 +75,11 @@ public class ZkService implements CommandLineRunner {
         if (!zkClient.exists(ERUPT_NODE)) {
             zkClient.createPersistent(ERUPT_NODE);
         }
-        //节点处理任务
-        Executors.newSingleThreadExecutor().execute(nodeWork);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(new NodeWorker(this), 0, 60, TimeUnit.SECONDS);
+        for (String child : zkClient.getChildren(ERUPT_NODE)) {
+            String data = zkClient.readData(ERUPT_NODE + "/" + child);
+            NodeManager.putNode(gson.fromJson(data, MetaNode.class));
+        }
         zkClient.subscribeChildChanges(ERUPT_NODE, (parent, list) -> {
             if (null == list) {
                 NodeManager.clearNodes();

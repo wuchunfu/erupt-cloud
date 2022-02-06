@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBean {
+public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBean {
 
     @Resource
     private EruptNodeProp eruptNodeProp;
@@ -67,6 +67,7 @@ public class EruptNodeWork implements ApplicationRunner, Runnable, DisposableBea
             NodeInfo nodeInfo = new NodeInfo();
             nodeInfo.setNodeName(eruptNodeProp.getNodeName());
             nodeInfo.setAccessToken(eruptNodeProp.getAccessToken());
+            nodeInfo.setPort(serverProperties.getPort());
             nodeInfo.setVersion(EruptInformation.getEruptVersion());
             nodeInfo.setContextPath(serverProperties.getServlet().getContextPath());
             nodeInfo.setErupts(EruptCoreService.getErupts().stream().map(EruptModel::getEruptName).collect(Collectors.toList()));

@@ -15,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
-import xyz.erupt.cloud.server.service.EruptNodeMicroservice;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
@@ -63,12 +62,12 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             if (!erupt.contains(".")) return true;
             int point = erupt.lastIndexOf(".");
             String appName = erupt.substring(0, point);
-            String eruptName = erupt.substring(point);
+            String eruptName = erupt.substring(point + 1);
             MetaNode metaNode = NodeManager.getNode(appName);
             if (null == metaNode) {
                 throw new EruptWebApiRuntimeException("The " + appName + " service is not registered");
             }
-            Map<String, String> headers = new HashMap<>();
+            final Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String name = headerNames.nextElement();
@@ -78,10 +77,11 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             headers.put(EruptMutualConst.TOKEN, request.getHeader(EruptMutualConst.TOKEN));
             headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
             String location = metaNode.getLocations().toArray(new String[0])[metaNode.getCount() % metaNode.getLocations().size()];
-            HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()),
-                            "https://www.erupt.xyz" + metaNode.getContextPath() + request.getRequestURI())
+            String url = location + request.getRequestURI().replace(erupt, eruptName);
+            HttpResponse httpResponse = HttpUtil.createRequest(Method.valueOf(request.getMethod()), url)
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
-                    .addHeaders(headers).header("token", "VsEjtBmUackiH3cY").execute();
+                    .addHeaders(headers)
+                    .execute();
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
             response.reset();
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
