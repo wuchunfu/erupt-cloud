@@ -54,7 +54,7 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
 
     @ManyToOne
     @EruptField(
-            views = @View(title = "所属分组"),
+            views = @View(title = "所属分组", column = "name"),
             edit = @Edit(title = "所属分组", type = EditType.REFERENCE_TREE, search = @Search)
     )
     private CloudNodeGroup cloudNodeGroup;
