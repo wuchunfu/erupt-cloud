@@ -23,7 +23,7 @@ import javax.persistence.UniqueConstraint;
 @Setter
 @Entity
 @Table(name = "e_cloud_node_group", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
-@Erupt(name = "服务组别")
+@Erupt(name = "节点组别")
 public class CloudNodeGroup extends MetaModel {
 
     @EruptField(
@@ -41,7 +41,7 @@ public class CloudNodeGroup extends MetaModel {
     @Lob
     @EruptField(
             views = @View(title = "描述"),
-            edit = @Edit(title = "描述",type = EditType.HTML_EDITOR)
+            edit = @Edit(title = "描述", type = EditType.HTML_EDITOR)
     )
     private String remark;
 
