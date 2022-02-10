@@ -56,7 +56,6 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         }
         if (null == eruptRouter) return true;
         if (EruptRouter.VerifyType.ERUPT == eruptRouter.verifyType()) {
-            if (NodeManager.getMetaNodeNum() <= 0) return true;
             String erupt = request.getHeader(EruptMutualConst.ERUPT);
             if (null != EruptCoreService.getErupt(erupt)) return true;
             if (!erupt.contains(".")) return true;
@@ -65,7 +64,8 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             String eruptName = erupt.substring(point + 1);
             MetaNode metaNode = NodeManager.getNode(appName);
             if (null == metaNode) {
-                throw new EruptWebApiRuntimeException("The " + appName + " service is not registered");
+                //TODO 自定义状态码
+                throw new EruptWebApiRuntimeException("'" + appName + "' node is not registered");
             }
             final Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
