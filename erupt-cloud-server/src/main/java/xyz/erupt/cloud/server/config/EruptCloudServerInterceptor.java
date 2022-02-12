@@ -32,7 +32,6 @@ import java.util.Map;
  * @author YuePeng
  * date 2018-12-20.
  */
-
 @Configuration
 @Component
 @Order(1)
