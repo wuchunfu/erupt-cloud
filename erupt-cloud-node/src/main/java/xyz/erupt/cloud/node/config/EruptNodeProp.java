@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("erupt-cloud.node")
+@ConfigurationProperties(EruptNodeProp.SPACE)
 public class EruptNodeProp {
+
+    public static final String SPACE = "erupt-cloud.node";
 
     //接入应用名称，用于分组隔离，推荐填写 本 Java 项目名称
     private String nodeName;

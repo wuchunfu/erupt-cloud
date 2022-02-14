@@ -5,6 +5,7 @@ import cn.hutool.http.HttpUtil;
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -22,6 +23,8 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * @author YuePeng
@@ -55,15 +58,15 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
     @Override
     public void run() {
         if (null == eruptNodeProp.getServerAddresses() || eruptNodeProp.getServerAddresses().length <= 0) {
-            throw new RuntimeException("erupt-cloud.node.serverAddresses not config");
+            throw new RuntimeException(EruptNodeProp.SPACE + ".serverAddresses not config");
         }
         if (null == eruptNodeProp.getNodeName()) {
-            throw new RuntimeException("erupt-cloud.node.nodeName not config");
+            throw new RuntimeException(EruptNodeProp.SPACE + ".nodeName not config");
         }
         if (null == eruptNodeProp.getAccessToken()) {
-            throw new RuntimeException("erupt-cloud.node.accessToken not config");
+            throw new RuntimeException(EruptNodeProp.SPACE + ".accessToken not config");
         }
-        log.info("\n" +
+        log.info(ansi().fg(Ansi.Color.BLUE) + " \n" +
                 "                         _    \n" +
                 "  ____  ____ _   _ ____ | |_  \n" +
                 " / _  )/ ___) | | |  _ \\|  _) \n" +
@@ -71,9 +74,9 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
                 " \\____)_|    \\____| ||_/ \\___)\n" +
                 "                  |_|\n" +
                 "\n" +
-                ":: Erupt Version ::  " + EruptInformation.getEruptVersion() + "\n" +
-                ":: Erupt Num     ::  " + EruptCoreService.getErupts().size() + "\n" +
-                ""
+                ":: Erupt Version :: " + EruptInformation.getEruptVersion() + "\n" +
+                ":: Erupt Num     :: " + EruptCoreService.getErupts().size() +
+                ansi().fg(Ansi.Color.DEFAULT)
         );
         while (this.runner) {
             NodeInfo nodeInfo = new NodeInfo();
