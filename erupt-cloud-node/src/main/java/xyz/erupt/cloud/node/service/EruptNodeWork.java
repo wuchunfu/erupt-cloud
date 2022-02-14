@@ -63,6 +63,18 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
         if (null == eruptNodeProp.getAccessToken()) {
             throw new RuntimeException("erupt-cloud.node.accessToken not config");
         }
+        log.info("\n" +
+                "                         _    \n" +
+                "  ____  ____ _   _ ____ | |_  \n" +
+                " / _  )/ ___) | | |  _ \\|  _) \n" +
+                "( (/ /| |   | |_| | | | | |__ \n" +
+                " \\____)_|    \\____| ||_/ \\___)\n" +
+                "                  |_|\n" +
+                "\n" +
+                ":: Erupt Version ::  " + EruptInformation.getEruptVersion() + "\n" +
+                ":: Erupt Num     ::  " + EruptCoreService.getErupts().size() + "\n" +
+                ""
+        );
         while (this.runner) {
             NodeInfo nodeInfo = new NodeInfo();
             nodeInfo.setNodeName(eruptNodeProp.getNodeName());
