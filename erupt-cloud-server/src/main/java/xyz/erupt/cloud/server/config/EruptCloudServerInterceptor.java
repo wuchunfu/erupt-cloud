@@ -51,8 +51,11 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         if (null == eruptRouter) return true;
         if (EruptRouter.VerifyType.ERUPT == eruptRouter.verifyType()) {
             String erupt = request.getHeader(EruptMutualConst.ERUPT);
-            if (null != EruptCoreService.getErupt(erupt)) return true;
+            if (erupt == null) {
+                erupt = request.getParameter("_" + EruptMutualConst.ERUPT);
+            }
             if (!erupt.contains(".")) return true;
+            if (null != EruptCoreService.getErupt(erupt)) return true;
             int point = erupt.lastIndexOf(".");
             String appName = erupt.substring(0, point);
             String eruptName = erupt.substring(point + 1);
