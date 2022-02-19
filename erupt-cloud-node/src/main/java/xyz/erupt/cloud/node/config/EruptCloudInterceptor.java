@@ -34,7 +34,6 @@ public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInte
         registry.addInterceptor(this).addPathPatterns(EruptRestPath.ERUPT_API + "/**");
     }
 
-    //不接受来自erupt-api的任何http请求
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (!eruptNodeProp.getAccessToken().equals(request.getHeader(CloudCommonConst.ACCESS_TOKEN))) {
