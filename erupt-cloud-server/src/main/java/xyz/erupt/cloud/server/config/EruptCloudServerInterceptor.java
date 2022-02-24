@@ -13,9 +13,11 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
+import xyz.erupt.cloud.server.base.CloudErrorModel;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.annotation.EruptRouter;
+import xyz.erupt.core.config.GsonFactory;
 import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
@@ -57,12 +59,12 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             if (!erupt.contains(".")) return true;
             if (null != EruptCoreService.getErupt(erupt)) return true;
             int point = erupt.lastIndexOf(".");
-            String appName = erupt.substring(0, point);
+            String nodeName = erupt.substring(0, point);
             String eruptName = erupt.substring(point + 1);
-            MetaNode metaNode = NodeManager.getNode(appName);
+            MetaNode metaNode = NodeManager.getNode(nodeName);
             if (null == metaNode) {
                 //TODO 自定义状态码
-                throw new EruptWebApiRuntimeException("'" + appName + "' node is not registered");
+                throw new EruptWebApiRuntimeException("'" + nodeName + "' node is not registered");
             }
             final Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
@@ -82,9 +84,13 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
             response.reset();
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write(httpResponse.body());
+            String body = httpResponse.body();
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
+                //返回统一状态码，前端统一处理
                 response.sendError(httpResponse.getStatus());
+                response.getWriter().write(GsonFactory.getGson().toJson(new CloudErrorModel(httpResponse.getStatus(), body, nodeName)));
+            } else {
+                response.getWriter().write(body);
             }
             return false;
         } else {
