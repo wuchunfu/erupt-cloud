@@ -52,17 +52,22 @@ public class ZkService implements CommandLineRunner {
         });
     }
 
-    //移除节点
-    public void remove(MetaNode metaNode) {
+    //移除节点中的某个地址
+    public void removeLocation(MetaNode metaNode,String location) {
         if (null != metaNode) {
             if (null == metaNode.getLocations() || metaNode.getLocations().size() == 1) {
                 NodeManager.removeNode(metaNode.getNodeName());
                 zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
             } else {
-                metaNode.getLocations().removeIf(location -> location.equals(request.getRequestURI()));
+                metaNode.getLocations().removeIf(it -> it.equals(location));
                 this.putNode(metaNode);
             }
         }
+    }
+
+    //移除节点
+    public void remove(MetaNode metaNode) {
+        zkClient.delete(ERUPT_NODE + "/" + metaNode.getNodeName());
     }
 
     @Override

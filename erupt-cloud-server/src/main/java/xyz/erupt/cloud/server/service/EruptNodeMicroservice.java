@@ -42,6 +42,13 @@ public class EruptNodeMicroservice {
         return cloudNode;
     }
 
+
+    //生成节点地址
+    private String geneNodeLocation(MetaNode metaNode) {
+        return request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + metaNode.getPort() +
+                (metaNode.getContextPath() == null ? "" : metaNode.getContextPath());
+    }
+
     public void registerNode(MetaNode metaNode) {
         Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
         metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + metaNode.getPort() +
@@ -53,7 +60,13 @@ public class EruptNodeMicroservice {
 
     public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
-        zkService.remove(NodeManager.getNode(nodeName));
+        MetaNode metaNode = NodeManager.getNode(nodeName);
+        zkService.removeLocation(metaNode, this.geneNodeLocation(metaNode));
     }
+
+    public void removeNodeByLocation(MetaNode nodeName, String location) {
+        zkService.removeLocation(nodeName, location);
+    }
+
 
 }

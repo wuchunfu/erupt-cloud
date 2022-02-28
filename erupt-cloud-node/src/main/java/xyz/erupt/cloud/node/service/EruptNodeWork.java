@@ -95,7 +95,7 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
                 }
                 TimeUnit.MILLISECONDS.sleep(eruptNodeProp.getHeartbeatTime());
             } catch (Exception e) {
-                log.error("{}: ", e.getMessage());
+                log.error(address + " -> {}", e.getMessage());
                 TimeUnit.SECONDS.sleep(5);
             }
         }
