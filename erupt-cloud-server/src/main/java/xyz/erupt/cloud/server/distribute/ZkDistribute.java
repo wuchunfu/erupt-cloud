@@ -10,13 +10,10 @@ import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 import xyz.erupt.cloud.server.node.NodeManager;
-import xyz.erupt.cloud.server.node.NodeWorker;
 import xyz.erupt.core.config.GsonFactory;
 
 import javax.annotation.Resource;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author YuePeng
@@ -76,7 +73,6 @@ public class ZkDistribute implements CommandLineRunner {
         if (!zkClient.exists(ERUPT_NODE)) {
             zkClient.createPersistent(ERUPT_NODE);
         }
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(new NodeWorker(this), 0, 60, TimeUnit.SECONDS);
         for (String child : zkClient.getChildren(ERUPT_NODE)) {
             String data = zkClient.readData(ERUPT_NODE + "/" + child);
             NodeManager.putNode(gson.fromJson(data, MetaNode.class));

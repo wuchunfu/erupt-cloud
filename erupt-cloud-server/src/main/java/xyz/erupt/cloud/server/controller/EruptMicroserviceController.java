@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.erupt.cloud.common.consts.ServerRestApiConst;
+import xyz.erupt.cloud.common.consts.CloudRestApiConst;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.base.R;
 import xyz.erupt.cloud.server.model.CloudNode;
@@ -24,7 +24,7 @@ public class EruptMicroserviceController {
 
     private final EruptNodeMicroservice eruptNodeMicroservice;
 
-    @RequestMapping(ServerRestApiConst.REGISTER_NODE)
+    @RequestMapping(CloudRestApiConst.REGISTER_NODE)
     public R registerNode(@RequestBody MetaNode metaNode) {
         CloudNode cloudNode = eruptNodeMicroservice.findNodeByAppName(metaNode.getNodeName(), metaNode.getAccessToken());
         if (!cloudNode.getStatus()) {
@@ -34,7 +34,7 @@ public class EruptMicroserviceController {
         return R.success();
     }
 
-    @RequestMapping(ServerRestApiConst.REMOVE_NODE)
+    @RequestMapping(CloudRestApiConst.REMOVE_NODE)
     public void removeNode(@RequestParam String nodeName, @RequestParam String accessToken) {
         eruptNodeMicroservice.removeNode(nodeName, accessToken);
     }

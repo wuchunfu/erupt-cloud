@@ -11,7 +11,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Component;
-import xyz.erupt.cloud.common.consts.ServerRestApiConst;
+import xyz.erupt.cloud.common.consts.CloudRestApiConst;
 import xyz.erupt.cloud.common.model.NodeInfo;
 import xyz.erupt.cloud.node.config.EruptNodeProp;
 import xyz.erupt.core.config.GsonFactory;
@@ -88,7 +88,7 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
             nodeInfo.setErupts(EruptCoreService.getErupts().stream().map(EruptModel::getEruptName).collect(Collectors.toList()));
             String address = eruptNodeProp.getServerAddresses()[count++ % eruptNodeProp.getServerAddresses().length];
             try {
-                HttpResponse httpResponse = HttpUtil.createPost(address + ServerRestApiConst.REGISTER_NODE)
+                HttpResponse httpResponse = HttpUtil.createPost(address + CloudRestApiConst.REGISTER_NODE)
                         .body(gson.toJson(nodeInfo)).execute();
                 if (!httpResponse.isOk()) {
                     log.error(httpResponse.body());
@@ -106,7 +106,7 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
         this.runner = false;
         // cancel register
         HttpUtil.createPost(eruptNodeProp.getServerAddresses()
-                [count++ % eruptNodeProp.getServerAddresses().length] + ServerRestApiConst.REMOVE_NODE
+                [count++ % eruptNodeProp.getServerAddresses().length] + CloudRestApiConst.REMOVE_NODE
         ).form(new HashMap<String, Object>() {{
             this.put("nodeName", eruptNodeProp.getNodeName());
             this.put("accessToken", eruptNodeProp.getAccessToken());

@@ -4,9 +4,11 @@ package xyz.erupt.cloud.common.consts;
  * @author YuePeng
  * date 2021/12/17 00:26
  */
-public class ServerRestApiConst {
+public class CloudRestApiConst {
 
     public static final String ERUPT_CLOUD_API = "/erupt-cloud-api";
+
+    public static final String NODE_HEALTH = "/node-health";
 
     public static final String REGISTER_NODE = ERUPT_CLOUD_API + "/register-node";
 
