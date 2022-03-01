@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.server.service;
+package xyz.erupt.cloud.server.distribute;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,6 @@ import xyz.erupt.cloud.server.node.NodeWorker;
 import xyz.erupt.core.config.GsonFactory;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class ZkService implements CommandLineRunner {
+public class ZkDistribute implements CommandLineRunner {
 
     public static final String ERUPT_NODE = "/erupt-node";
 
@@ -33,9 +32,6 @@ public class ZkService implements CommandLineRunner {
 
     @Resource
     private EruptCloudServerProp eruptCloudServerProp;
-
-    @Resource
-    private HttpServletRequest request;
 
     private ZkClient zkClient;
 
@@ -53,7 +49,7 @@ public class ZkService implements CommandLineRunner {
     }
 
     //移除节点中的某个地址
-    public void removeLocation(MetaNode metaNode,String location) {
+    public void removeLocation(MetaNode metaNode, String location) {
         if (null != metaNode) {
             if (null == metaNode.getLocations() || metaNode.getLocations().size() == 1) {
                 NodeManager.removeNode(metaNode.getNodeName());

@@ -2,6 +2,7 @@ package xyz.erupt.cloud.server.service;
 
 import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
+import xyz.erupt.cloud.server.distribute.ZkDistribute;
 import xyz.erupt.cloud.server.model.CloudNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.jpa.dao.EruptDao;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public class EruptNodeMicroservice {
 
     @Resource
-    private ZkService zkService;
+    private ZkDistribute zkDistribute;
 
     @Resource
     private EruptDao eruptDao;
@@ -55,17 +56,17 @@ public class EruptNodeMicroservice {
                 (metaNode.getContextPath() == null ? "" : metaNode.getContextPath()));
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
         metaNode.setRegisterTime(new Date());
-        zkService.putNode(metaNode);
+        zkDistribute.putNode(metaNode);
     }
 
     public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
         MetaNode metaNode = NodeManager.getNode(nodeName);
-        zkService.removeLocation(metaNode, this.geneNodeLocation(metaNode));
+        zkDistribute.removeLocation(metaNode, this.geneNodeLocation(metaNode));
     }
 
     public void removeNodeByLocation(MetaNode nodeName, String location) {
-        zkService.removeLocation(nodeName, location);
+        zkDistribute.removeLocation(nodeName, location);
     }
 
 
