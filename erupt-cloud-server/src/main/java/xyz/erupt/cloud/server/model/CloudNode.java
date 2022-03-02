@@ -75,19 +75,19 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
 
     @Transient
     @EruptField(
-            views = @View(title = "Erupt 类数量")
+            views = @View(title = "Erupt 类数量", className = "text-center")
     )
     private Integer eruptNum;
 
     @Transient
     @EruptField(
-            views = @View(title = "实例数量")
+            views = @View(title = "实例数量", className = "text-center")
     )
     private Integer instanceNum;
 
     @Transient
     @EruptField(
-            views = @View(title = "请求次数")
+            views = @View(title = "请求次数", className = "text-center")
     )
     private Integer netCount;
 
@@ -109,7 +109,9 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
         for (Map<String, Object> map : list) {
             MetaNode metaNode = NodeManager.getNode(map.get(NODE_NAME).toString());
             if (null == metaNode) {
-                map.put("instanceNum", 0);
+                map.put("eruptNum", '-');
+                map.put("instanceNum", '-');
+                map.put("netCount", '-');
             } else {
                 map.put("eruptNum", metaNode.getErupts().size());
                 map.put("instanceNum", metaNode.getLocations().size());

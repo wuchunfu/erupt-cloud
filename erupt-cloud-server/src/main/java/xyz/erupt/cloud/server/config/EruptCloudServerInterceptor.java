@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author YuePeng
@@ -44,13 +43,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Order(1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
 
-    //失败次数
-    private final Map<String, Integer> errorNum = new ConcurrentHashMap<>();
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(this).addPathPatterns(EruptRestPath.ERUPT_API + "/**");
     }
+
     @Resource
     private EruptNodeMicroservice eruptNodeMicroservice;
 
@@ -66,6 +63,9 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             if (erupt == null) {
                 erupt = request.getParameter("_" + EruptMutualConst.ERUPT);
             }
+            if (erupt == null) {
+                return true;
+            }
             if (!erupt.contains(".")) return true;
             if (null != EruptCoreService.getErupt(erupt)) return true;
             int point = erupt.lastIndexOf(".");
@@ -74,7 +74,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             MetaNode metaNode = NodeManager.getNode(nodeName);
             if (null == metaNode) {
                 //TODO 自定义状态码
-                throw new EruptWebApiRuntimeException("'" + nodeName + "' node is not registered");
+                throw new EruptWebApiRuntimeException("'" + nodeName + "' node not ready");
             }
             final Map<String, String> headers = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
@@ -84,18 +84,23 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             }
             headers.put(EruptMutualConst.ERUPT, eruptName);
             headers.put(EruptMutualConst.TOKEN, request.getHeader(EruptMutualConst.TOKEN));
-            headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
             HttpResponse httpResponse = this.httpProxy(request, metaNode, request.getRequestURI().replace(erupt, eruptName), headers);
-            httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
-            response.reset();
+            response.setContentType(httpResponse.header("Content-Type"));
+//            response.reset();
+//            httpResponse.headers().forEach((k, v) -> {
+//                System.out.println(v);
+//                response.setHeader(k, v.get(0));
+//            });
+//            response.setHeader("Access-Control-Allow-Origin", "*");
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            String body = httpResponse.body();
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
                 //返回统一状态码，前端统一处理
                 response.sendError(httpResponse.getStatus());
-                response.getWriter().write(GsonFactory.getGson().toJson(new CloudErrorModel(httpResponse.getStatus(), body, nodeName)));
+                response.getWriter().write(GsonFactory.getGson().toJson(
+                        new CloudErrorModel(httpResponse.getStatus(), httpResponse.body(), nodeName))
+                );
             } else {
-                response.getWriter().write(body);
+                response.getOutputStream().write(httpResponse.bodyBytes());
             }
             return false;
         } else {
@@ -106,24 +111,26 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
     @SneakyThrows
     public HttpResponse httpProxy(HttpServletRequest request, MetaNode metaNode, String path, Map<String, String> headers) {
         String location = metaNode.getLocations().toArray(new String[0])[metaNode.getCount() % metaNode.getLocations().size()];
+        headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
+//        headers.remove("host");
         try {
             return HttpUtil.createRequest(Method.valueOf(request.getMethod()), location + path)
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))
-                    .addHeaders(headers)
-                    .execute();
+                    .addHeaders(headers).execute();
         } catch (ConnectException connectException) {
-            errorNum.get(location);
-            if (errorNum.containsKey(location)) {
-                errorNum.put(location, errorNum.get(location) + 1);
-            } else {
-                errorNum.put(location, 1);
-            }
-            //如果连续失败五次就从服务ip中移除,重新注册
-            if (errorNum.get(location) >= 5) {
-                errorNum.remove(location);
-                eruptNodeMicroservice.removeNodeByLocation(metaNode, location);
-            }
-            throw new RuntimeException(connectException.getMessage());
+            throw new EruptWebApiRuntimeException(location + " -> " + connectException.getMessage());
+//            errorNum.get(location);
+//            if (errorNum.containsKey(location)) {
+//                errorNum.put(location, errorNum.get(location) + 1);
+//            } else {
+//                errorNum.put(location, 1);
+//            }
+//            //如果连续失败五次就从服务ip中移除,重新注册
+//            if (errorNum.get(location) >= 5) {
+//                errorNum.remove(location);
+//                eruptNodeMicroservice.removeNodeByLocation(metaNode, location);
+//            }
+//            throw new RuntimeException(connectException.getMessage());
         }
     }
 
