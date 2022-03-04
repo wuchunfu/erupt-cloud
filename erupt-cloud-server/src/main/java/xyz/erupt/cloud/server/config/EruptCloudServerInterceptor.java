@@ -14,8 +14,8 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
-import xyz.erupt.cloud.server.base.CloudErrorModel;
 import xyz.erupt.cloud.server.base.MetaNode;
+import xyz.erupt.cloud.server.exception.EruptCloudErrorModel;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.cloud.server.service.EruptNodeMicroservice;
 import xyz.erupt.core.annotation.EruptRouter;
@@ -86,22 +86,19 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             headers.put(EruptMutualConst.TOKEN, request.getHeader(EruptMutualConst.TOKEN));
             HttpResponse httpResponse = this.httpProxy(request, metaNode, request.getRequestURI().replace(erupt, eruptName), headers);
             response.setContentType(httpResponse.header("Content-Type"));
-//            response.reset();
-//            httpResponse.headers().forEach((k, v) -> {
-//                System.out.println(v);
-//                response.setHeader(k, v.get(0));
-//            });
-//            response.setHeader("Access-Control-Allow-Origin", "*");
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
                 //返回统一状态码，前端统一处理
                 response.sendError(httpResponse.getStatus());
                 response.getWriter().write(GsonFactory.getGson().toJson(
-                        new CloudErrorModel(httpResponse.getStatus(), httpResponse.body(), nodeName))
+                        new EruptCloudErrorModel(httpResponse.getStatus(), httpResponse.body(), nodeName))
                 );
             } else {
                 response.getOutputStream().write(httpResponse.bodyBytes());
             }
+            response.reset();
+            httpResponse.headers().forEach((k, v) -> response.setHeader(k, v.get(0)));
+            response.setHeader("Access-Control-Allow-Origin", "*");
             return false;
         } else {
             return true;
@@ -112,7 +109,6 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
     public HttpResponse httpProxy(HttpServletRequest request, MetaNode metaNode, String path, Map<String, String> headers) {
         String location = metaNode.getLocations().toArray(new String[0])[metaNode.getCount() % metaNode.getLocations().size()];
         headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
-//        headers.remove("host");
         try {
             return HttpUtil.createRequest(Method.valueOf(request.getMethod()), location + path)
                     .body(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8))

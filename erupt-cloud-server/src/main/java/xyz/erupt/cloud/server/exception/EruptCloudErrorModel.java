@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.server.base;
+package xyz.erupt.cloud.server.exception;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CloudErrorModel {
+public class EruptCloudErrorModel {
 
     int status;
 
@@ -17,7 +17,7 @@ public class CloudErrorModel {
 
     String node;
 
-    public CloudErrorModel(int status, String message, String node) {
+    public EruptCloudErrorModel(int status, String message, String node) {
         this.status = status;
         this.message = message;
         this.node = node;
