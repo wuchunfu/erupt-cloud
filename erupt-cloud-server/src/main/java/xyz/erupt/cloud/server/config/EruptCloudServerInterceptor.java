@@ -25,7 +25,9 @@ import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 import xyz.erupt.core.service.EruptCoreService;
+import xyz.erupt.upms.service.EruptContextService;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
@@ -45,6 +47,9 @@ import java.util.Optional;
 @Slf4j
 @Order(1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
+
+    @Resource
+    private EruptContextService eruptContextService;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -111,6 +116,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             headers.put(name, request.getHeader(name));
         }
         headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
+        headers.put(EruptMutualConst.TOKEN, eruptContextService.getCurrentToken());
         headers.put(EruptMutualConst.ERUPT, eruptName);
         HttpRequest httpRequest = HttpUtil.createRequest(Method.valueOf(request.getMethod()), location + path);
         try {

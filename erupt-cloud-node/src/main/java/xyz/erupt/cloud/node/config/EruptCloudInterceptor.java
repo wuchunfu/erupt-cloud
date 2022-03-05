@@ -39,12 +39,11 @@ public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInte
         if (!eruptNodeProp.getAccessToken().equals(request.getHeader(CloudCommonConst.ACCESS_TOKEN))) {
             throw new EruptWebApiRuntimeException("access token incorrect");
         }
+        MetaContext.registerToken(request.getHeader(EruptMutualConst.TOKEN));
         MetaContext.register(new MetaUser("1", "test", "测试"));
         MetaContext.register(new MetaErupt(request.getHeader(EruptMutualConst.ERUPT)));
         //node节点管理的erupt类禁止浏览器直接访问
-        response.setHeader("Access-Control-Allow-Origin", "");
-        response.setHeader("Access-Control-Allow-Headers", "*");
-        response.setHeader("Access-Control-Allow-Methods", "*");
+        response.setHeader("Access-Control-Allow-Origin", "0.0.0.0");
         return true;
     }
 

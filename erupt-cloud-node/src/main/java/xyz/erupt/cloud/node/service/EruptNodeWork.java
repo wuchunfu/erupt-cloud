@@ -44,8 +44,6 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
 
     private boolean runner = true;
 
-    private int count = 0;
-
     @Override
     public void run(ApplicationArguments args) {
         Thread register = new Thread(this);
@@ -86,7 +84,7 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
             nodeInfo.setVersion(EruptInformation.getEruptVersion());
             nodeInfo.setContextPath(serverProperties.getServlet().getContextPath());
             nodeInfo.setErupts(EruptCoreService.getErupts().stream().map(EruptModel::getEruptName).collect(Collectors.toList()));
-            String address = eruptNodeProp.getServerAddresses()[count++ % eruptNodeProp.getServerAddresses().length];
+            String address = eruptNodeProp.getBalanceAddress();
             try {
                 HttpResponse httpResponse = HttpUtil.createPost(address + CloudRestApiConst.REGISTER_NODE)
                         .body(gson.toJson(nodeInfo)).execute();
@@ -105,8 +103,7 @@ public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBea
     public void destroy() {
         this.runner = false;
         // cancel register
-        HttpUtil.createPost(eruptNodeProp.getServerAddresses()
-                [count++ % eruptNodeProp.getServerAddresses().length] + CloudRestApiConst.REMOVE_NODE
+        HttpUtil.createPost(eruptNodeProp.getBalanceAddress() + CloudRestApiConst.REMOVE_NODE
         ).form(new HashMap<String, Object>() {{
             this.put("nodeName", eruptNodeProp.getNodeName());
             this.put("accessToken", eruptNodeProp.getAccessToken());

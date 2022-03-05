@@ -29,4 +29,12 @@ public class EruptNodeProp {
     //心跳时间(毫秒)
     private int heartbeatTime = 15 * 1000;
 
+    private int count = 0;
+
+    public String getBalanceAddress() {
+        if (count >= Integer.MAX_VALUE) {
+            count = 0;
+        }
+        return this.serverAddresses[count++ % this.serverAddresses.length];
+    }
 }
