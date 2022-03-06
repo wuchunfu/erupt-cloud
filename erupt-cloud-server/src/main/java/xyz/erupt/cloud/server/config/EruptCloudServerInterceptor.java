@@ -6,6 +6,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
 import xyz.erupt.cloud.server.base.MetaNode;
-import xyz.erupt.cloud.server.exception.EruptCloudErrorModel;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.config.GsonFactory;
@@ -45,7 +45,7 @@ import java.util.Optional;
 @Configuration
 @Component
 @Slf4j
-@Order(1)
+@Order(Integer.MAX_VALUE - 1)
 public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
 
     @Resource
@@ -85,25 +85,34 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
                 //TODO 自定义状态码
                 throw new EruptWebApiRuntimeException("'" + nodeName + "' node not ready");
             }
+
             HttpResponse httpResponse = this.httpProxy(request, metaNode, request.getRequestURI().replace(erupt, eruptName), eruptName);
             Optional.ofNullable(httpResponse.header("Content-Type")).ifPresent(response::setContentType);
             for (String transferHeader : TRANSFER_HEADERS) {
                 Optional.ofNullable(httpResponse.header(transferHeader)).ifPresent(it -> response.addHeader(transferHeader, it));
             }
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            if (httpResponse.getStatus() != HttpStatus.OK.value()) {
-                //返回统一状态码，前端统一处理
-                response.sendError(httpResponse.getStatus());
-                response.getWriter().write(GsonFactory.getGson().toJson(
-                        new EruptCloudErrorModel(httpResponse.getStatus(), httpResponse.body(), nodeName))
-                );
-            } else {
-                response.getOutputStream().write(httpResponse.bodyBytes());
+            if (httpResponse.getStatus() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+                if (this.isSimpleJson(httpResponse.body())) {
+                    throw new EruptWebApiRuntimeException(GsonFactory.getGson().fromJson(httpResponse.body(), Map.class), false);
+                } else {
+                    throw new EruptWebApiRuntimeException(httpResponse.body(), false);
+                }
             }
+            if (httpResponse.getStatus() != HttpStatus.OK.value()) {
+                response.sendError(httpResponse.getStatus());
+            }
+            response.getOutputStream().write(httpResponse.bodyBytes());
             return false;
         } else {
             return true;
         }
+    }
+
+    private boolean isSimpleJson(String str) {
+        if (StringUtils.isBlank(str)) return false;
+        str = str.trim();
+        return str.startsWith("{") && str.endsWith("}");
     }
 
     @SneakyThrows
@@ -127,7 +136,11 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             } else {
                 httpRequest.body(StreamUtils.copyToByteArray(request.getInputStream()));
             }
-            return httpRequest.addHeaders(headers).execute();
+            HttpResponse httpResponse = httpRequest.addHeaders(headers).execute();
+            if (httpResponse.getStatus() != HttpStatus.OK.value()) {
+                log.warn("{} -> {}", location, httpResponse.body());
+            }
+            return httpResponse;
         } catch (ConnectException connectException) {
             throw new EruptWebApiRuntimeException(location + " -> " + connectException.getMessage());
         }

@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.node.service;
+package xyz.erupt.cloud.node.work;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -32,7 +32,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 @Component
 @Slf4j
-public class EruptNodeWork implements Runnable, ApplicationRunner, DisposableBean {
+public class EruptNodeStart implements Runnable, ApplicationRunner, DisposableBean {
 
     @Resource
     private EruptNodeProp eruptNodeProp;

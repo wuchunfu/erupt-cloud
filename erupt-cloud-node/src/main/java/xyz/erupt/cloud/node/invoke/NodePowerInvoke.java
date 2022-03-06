@@ -30,7 +30,7 @@ public class NodePowerInvoke implements PowerHandler {
 
     @Override
     public void handler(PowerObject power) {
-        String powerObjectString = HttpUtil.createGet(CloudRestApiConst.ERUPT_POWER + eruptNodeProp.getBalanceAddress())
+        String powerObjectString = HttpUtil.createGet(eruptNodeProp.getBalanceAddress() + CloudRestApiConst.ERUPT_POWER)
                 .form("nodeName", eruptNodeProp.getNodeName())
                 .form("eruptName", MetaContext.getErupt().getName())
                 .header(EruptMutualConst.TOKEN, MetaContext.getToken()).execute().body();

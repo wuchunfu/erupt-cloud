@@ -3,6 +3,7 @@ package xyz.erupt.cloud.server.node;
 import cn.hutool.http.HttpUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.stereotype.Component;
 import xyz.erupt.cloud.common.consts.CloudRestApiConst;
 import xyz.erupt.cloud.server.distribute.ZkDistribute;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * date 2022/2/3 21:36
  */
 @AllArgsConstructor
+@Component
 public class NodeWorker implements Runnable {
 
     private final ZkDistribute zkDistribute;

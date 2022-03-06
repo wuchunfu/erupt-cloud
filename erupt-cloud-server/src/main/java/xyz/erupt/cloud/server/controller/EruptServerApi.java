@@ -34,13 +34,15 @@ public class EruptServerApi {
         List<String> values = eruptSessionService.getMapKeys(SessionKey.MENU_VALUE_MAP + eruptContextService.getCurrentToken());
         Map<String, Boolean> permissionMap = values.stream().collect(Collectors.toMap(it -> it, it -> true));
         String name = nodeName + "." + eruptName;
+        powerObject.setQuery(permissionMap.containsKey(name.toLowerCase()));
         powerObject.setAdd(powerOff(EruptFunPermissions.ADD, permissionMap, name));
         powerObject.setDelete(powerOff(EruptFunPermissions.DELETE, permissionMap, name));
+        powerObject.setAdd(powerOff(EruptFunPermissions.ADD, permissionMap, name));
         powerObject.setEdit(powerOff(EruptFunPermissions.EDIT, permissionMap, name));
         powerObject.setExport(powerOff(EruptFunPermissions.EXPORT, permissionMap, name));
         powerObject.setImportable(powerOff(EruptFunPermissions.IMPORTABLE, permissionMap, name));
         powerObject.setViewDetails(powerOff(EruptFunPermissions.VIEW_DETAIL, permissionMap, name));
-        return null;
+        return powerObject;
     }
 
     private boolean powerOff(EruptFunPermissions eruptFunPermissions, Map<String, Boolean> permissionMap, String name) {
