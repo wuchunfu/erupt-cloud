@@ -1,9 +1,15 @@
 package xyz.erupt.cloud.node.invoke;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.http.HttpUtil;
 import org.springframework.stereotype.Component;
 import xyz.erupt.annotation.fun.PowerHandler;
 import xyz.erupt.annotation.fun.PowerObject;
+import xyz.erupt.cloud.common.consts.CloudRestApiConst;
 import xyz.erupt.cloud.node.config.EruptNodeProp;
+import xyz.erupt.core.config.GsonFactory;
+import xyz.erupt.core.constant.EruptMutualConst;
+import xyz.erupt.core.context.MetaContext;
 import xyz.erupt.core.invoke.PowerInvoke;
 
 import javax.annotation.Resource;
@@ -24,8 +30,11 @@ public class NodePowerInvoke implements PowerHandler {
 
     @Override
     public void handler(PowerObject power) {
-//        HttpUtil.get()
-        eruptNodeProp.getBalanceAddress();
+        String powerObjectString = HttpUtil.createGet(CloudRestApiConst.ERUPT_POWER + eruptNodeProp.getBalanceAddress())
+                .form("nodeName", eruptNodeProp.getNodeName())
+                .form("eruptName", MetaContext.getErupt().getName())
+                .header(EruptMutualConst.TOKEN, MetaContext.getToken()).execute().body();
+        BeanUtil.copyProperties(GsonFactory.getGson().fromJson(powerObjectString, PowerObject.class), power);
     }
 
 }

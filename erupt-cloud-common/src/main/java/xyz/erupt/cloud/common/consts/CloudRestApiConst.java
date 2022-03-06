@@ -14,4 +14,6 @@ public class CloudRestApiConst {
 
     public static final String REMOVE_NODE = ERUPT_CLOUD_API + "/remove-node";
 
+    public static final String ERUPT_POWER = ERUPT_CLOUD_API + "/erupt-power";
+
 }

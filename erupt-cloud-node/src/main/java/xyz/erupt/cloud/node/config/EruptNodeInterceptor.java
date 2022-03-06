@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @Component
-public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
+public class EruptNodeInterceptor implements WebMvcConfigurer, AsyncHandlerInterceptor {
 
     @Resource
     private EruptNodeProp eruptNodeProp;
@@ -37,7 +37,7 @@ public class EruptCloudInterceptor implements WebMvcConfigurer, AsyncHandlerInte
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (!eruptNodeProp.getAccessToken().equals(request.getHeader(CloudCommonConst.ACCESS_TOKEN))) {
-            throw new EruptWebApiRuntimeException("access token incorrect");
+            throw new EruptWebApiRuntimeException("AccessToken incorrect");
         }
         MetaContext.registerToken(request.getHeader(EruptMutualConst.TOKEN));
         MetaContext.register(new MetaUser("1", "test", "测试"));
