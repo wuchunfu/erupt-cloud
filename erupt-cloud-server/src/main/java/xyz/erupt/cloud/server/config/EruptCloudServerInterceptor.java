@@ -127,7 +127,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         headers.put(CloudCommonConst.ACCESS_TOKEN, metaNode.getAccessToken());
         headers.put(EruptMutualConst.TOKEN, eruptContextService.getCurrentToken());
         headers.put(EruptMutualConst.ERUPT, eruptName);
-        HttpRequest httpRequest = HttpUtil.createRequest(Method.valueOf(request.getMethod()), location + path);
+        HttpRequest httpRequest = HttpUtil.createRequest(Method.valueOf(request.getMethod()), location + path + "?" + request.getQueryString());
         try {
             if (null != request.getContentType() && request.getContentType().contains("multipart/form-data")) {
                 for (Part part : request.getParts()) {

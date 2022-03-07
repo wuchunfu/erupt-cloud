@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.node.work;
+package xyz.erupt.cloud.node.start;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -72,8 +72,7 @@ public class EruptNodeStart implements Runnable, ApplicationRunner, DisposableBe
                 " \\____)_|    \\____| ||_/ \\___)\n" +
                 "                  |_|\n" +
                 "\n" +
-                ":: Erupt Version :: " + EruptInformation.getEruptVersion() + "\n" +
-                ":: Erupt Num     :: " + EruptCoreService.getErupts().size() +
+                ":: Erupt Cloud Version :: " + EruptInformation.getEruptVersion() + "\n" +
                 ansi().fg(Ansi.Color.DEFAULT)
         );
         while (this.runner) {
