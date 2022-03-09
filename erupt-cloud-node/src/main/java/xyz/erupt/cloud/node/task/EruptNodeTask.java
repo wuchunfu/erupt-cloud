@@ -1,10 +1,11 @@
-package xyz.erupt.cloud.node.start;
+package xyz.erupt.cloud.node.task;
 
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.ApplicationArguments;
@@ -32,17 +33,16 @@ import static org.fusesource.jansi.Ansi.ansi;
  */
 @Component
 @Slf4j
-public class EruptNodeStart implements Runnable, ApplicationRunner, DisposableBean {
-
-    @Resource
-    private EruptNodeProp eruptNodeProp;
-
-    @Resource
-    private ServerProperties serverProperties;
+public class EruptNodeTask implements Runnable, ApplicationRunner, DisposableBean {
 
     private final Gson gson = GsonFactory.getGson();
-
+    @Resource
+    private EruptNodeProp eruptNodeProp;
+    @Resource
+    private ServerProperties serverProperties;
     private boolean runner = true;
+
+    private String instanceId = RandomStringUtils.randomAlphabetic(6);
 
     @Override
     public void run(ApplicationArguments args) {
@@ -77,6 +77,7 @@ public class EruptNodeStart implements Runnable, ApplicationRunner, DisposableBe
         );
         while (this.runner) {
             NodeInfo nodeInfo = new NodeInfo();
+            nodeInfo.setInstanceId(instanceId);
             nodeInfo.setNodeName(eruptNodeProp.getNodeName());
             nodeInfo.setAccessToken(eruptNodeProp.getAccessToken());
             nodeInfo.setPort(serverProperties.getPort());

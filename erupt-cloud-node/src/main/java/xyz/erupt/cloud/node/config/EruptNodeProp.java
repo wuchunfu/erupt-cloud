@@ -32,6 +32,9 @@ public class EruptNodeProp {
     private int count = 0;
 
     public String getBalanceAddress() {
+        if (this.serverAddresses.length == 1) {
+            return this.serverAddresses[0];
+        }
         if (count >= Integer.MAX_VALUE) {
             count = 0;
         }

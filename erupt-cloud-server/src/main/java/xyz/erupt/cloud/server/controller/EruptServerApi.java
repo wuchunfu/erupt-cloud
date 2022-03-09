@@ -29,7 +29,7 @@ public class EruptServerApi {
     private EruptContextService eruptContextService;
 
     @RequestMapping(CloudRestApiConst.ERUPT_POWER)
-    public PowerObject findPower(String eruptName, String nodeName) {
+    public PowerObject eruptPower(String eruptName, String nodeName) {
         PowerObject powerObject = new PowerObject();
         List<String> values = eruptSessionService.getMapKeys(SessionKey.MENU_VALUE_MAP + eruptContextService.getCurrentToken());
         Map<String, Boolean> permissionMap = values.stream().collect(Collectors.toMap(it -> it, it -> true));
