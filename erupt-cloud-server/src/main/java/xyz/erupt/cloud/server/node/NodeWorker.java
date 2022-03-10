@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import xyz.erupt.cloud.common.consts.CloudRestApiConst;
-import xyz.erupt.cloud.server.distribute.ZkDistribute;
+import xyz.erupt.cloud.server.distribute.DistributeFactory;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class NodeWorker implements Runnable {
 
-    private final ZkDistribute zkDistribute;
+    private final DistributeFactory distributeFactory;
 
     @PostConstruct
     public void postConstruct() {
@@ -34,9 +34,11 @@ public class NodeWorker implements Runnable {
     public void run() {
         NodeManager.consumerNode(node -> {
             if (new Date().getTime() - 1000 * 60 >= node.getRegisterTime().getTime()) {
-                zkDistribute.remove(node); //长时间未注册节点从 zk 中移除
+                distributeFactory.factory().removeNode(node.getNodeName()); //长时间未注册节点从 zk 中移除
             }
-            node.getLocations().removeIf(location -> !health(location, 2));
+            if (node.getLocations().removeIf(location -> !health(location, 2))) {
+                distributeFactory.factory().putNode(node);
+            }
         });
     }
 

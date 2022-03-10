@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.Watcher;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
@@ -21,7 +20,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
-public class ZkDistribute implements CommandLineRunner {
+public class ZkDistribute extends DistributeAbstract {
 
     public static final String ERUPT_NODE = "/erupt-node";
 
@@ -64,7 +63,7 @@ public class ZkDistribute implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void init() {
         if (null == eruptCloudServerProp.getZkServers() || eruptCloudServerProp.getZkServers().size() <= 0) {
             log.error("Not configured zookeeper cluster");
             return;
@@ -104,6 +103,16 @@ public class ZkDistribute implements CommandLineRunner {
                 throwable.printStackTrace();
             }
         });
+    }
+
+    @Override
+    protected void distributePut(MetaNode metaNode) {
+
+    }
+
+    @Override
+    protected void distributeRemove(String nodeName) {
+
     }
 
 }
