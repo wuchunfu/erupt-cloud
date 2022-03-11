@@ -43,7 +43,6 @@ public class EruptNodeMicroservice {
         return cloudNode;
     }
 
-
     //生成节点地址
     private String geneNodeLocation(MetaNode metaNode) {
         return request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + metaNode.getPort() +
@@ -52,8 +51,7 @@ public class EruptNodeMicroservice {
 
     public void registerNode(MetaNode metaNode) {
         Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
-        metaNode.getLocations().add(request.getScheme() + "://" + IpUtil.getIpAddr(request) + ":" + metaNode.getPort() +
-                (metaNode.getContextPath() == null ? "" : metaNode.getContextPath()));
+        metaNode.getLocations().add(geneNodeLocation(metaNode));
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
         metaNode.setRegisterTime(new Date());
         distributeFactory.factory().putNode(metaNode);
@@ -61,12 +59,7 @@ public class EruptNodeMicroservice {
 
     public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
-        MetaNode metaNode = NodeManager.getNode(nodeName);
-//        distributeFactory.factory().removeLocation(metaNode, this.geneNodeLocation(metaNode));
-    }
-
-    public void removeNodeByLocation(MetaNode nodeName, String location) {
-//        distributeFactory.factory().removeLocation(nodeName, location);
+        distributeFactory.factory().removeNode(NodeManager.getNode(nodeName).getNodeName());
     }
 
 

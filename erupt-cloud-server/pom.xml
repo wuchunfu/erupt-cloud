@@ -31,20 +31,20 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>xyz.erupt</groupId>
-            <artifactId>erupt-tpl</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.101tec</groupId>
-            <artifactId>zkclient</artifactId>
-            <version>0.11</version>
-        </dependency>
-        <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-http</artifactId>
             <version>5.7.17</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>xyz.erupt</groupId>-->
+        <!--            <artifactId>erupt-tpl</artifactId>-->
+        <!--            <version>${parent.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.101tec</groupId>-->
+        <!--            <artifactId>zkclient</artifactId>-->
+        <!--            <version>0.11</version>-->
+        <!--        </dependency>-->
     </dependencies>
 </project>
 

@@ -26,7 +26,7 @@ public class NodeWorker implements Runnable {
 
     @PostConstruct
     public void postConstruct() {
-        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(this, 0, 60, TimeUnit.SECONDS);
+        Executors.newScheduledThreadPool(3).scheduleAtFixedRate(this, 0, 60, TimeUnit.SECONDS);
     }
 
     @SneakyThrows

@@ -12,19 +12,16 @@ import javax.annotation.Resource;
 @Component
 public class DistributeFactory implements CommandLineRunner {
 
-    public DistributeAbstract distributeAbstract;
-
     @Resource
-    private RedisDistribute redisDistribute;
+    private DistributeAbstract redisDistribute;
 
     @Override
     public void run(String... args) throws Exception {
-        distributeAbstract = redisDistribute;
-        distributeAbstract.init();
+        redisDistribute.init();
     }
 
     public DistributeAbstract factory() {
-        return distributeAbstract;
+        return redisDistribute;
     }
 
 
