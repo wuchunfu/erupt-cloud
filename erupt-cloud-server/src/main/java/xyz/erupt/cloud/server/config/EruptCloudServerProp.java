@@ -18,11 +18,15 @@ import java.util.List;
 @ConfigurationProperties("erupt-cloud.server")
 public class EruptCloudServerProp {
 
+    private Integer nodeExpireTime = 1000 * 60;
+
     //实例ID，集群环境下，要保证每台机器不同。默认启动后随机生成，如无特殊情况可不配置。
     private String instanceId = RandomStringUtils.randomAlphabetic(6);
 
     //多实例集群订阅通道
     private String topicChannel = "erupt-cloud:notify:channel";
+
+    private String keyNameSpace = "erupt-cloud:";
 
     // zookeeper 集群地址
     private List<String> zkServers;
