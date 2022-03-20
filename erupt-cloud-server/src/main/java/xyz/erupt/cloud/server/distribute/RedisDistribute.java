@@ -3,18 +3,11 @@ package xyz.erupt.cloud.server.distribute;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
-import xyz.erupt.cloud.server.model.ChannelSwapModel;
-import xyz.erupt.cloud.server.node.NodeManager;
+import xyz.erupt.cloud.server.node.MetaNode;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,41 +22,35 @@ public class RedisDistribute extends DistributeAbstract implements MessageListen
     public static final String NODE_SPACE = "node:";
 
     @Resource
-    private RedisConnectionFactory redisConnectionFactory;
-
-    @Resource
     private EruptCloudServerProp eruptCloudServerProp;
-
-//    @Resource
-//    private RedisTemplate<String, ChannelSwapModel> redisTemplate;
 
     @Resource
     private RedisTemplate<String, MetaNode> redisTemplate;
 
     @Override
     public void init() {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        Optional.ofNullable(redisTemplate.keys(eruptCloudServerProp.getKeyNameSpace() + NODE_SPACE + "*")).flatMap(keys ->
-                Optional.ofNullable(redisTemplate.opsForValue().multiGet(keys))).ifPresent(nodes -> {
-                    for (MetaNode metaNode : nodes) {
-                        NodeManager.putNode(metaNode);
-                    }
-                }
-        );
-        container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(new MessageListenerAdapter(this), new ChannelTopic(eruptCloudServerProp.getTopicChannel()));
+//        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+//        Optional.ofNullable(redisTemplate.keys(eruptCloudServerProp.getKeyNameSpace() + NODE_SPACE + "*")).flatMap(keys ->
+//                Optional.ofNullable(redisTemplate.opsForValue().multiGet(keys))).ifPresent(nodes -> {
+//                    for (MetaNode metaNode : nodes) {
+//                        NodeManager.putNode(metaNode);
+//                    }
+//                }
+//        );
+//        container.setConnectionFactory(redisConnectionFactory);
+//        container.addMessageListener(new MessageListenerAdapter(this), new ChannelTopic(eruptCloudServerProp.getTopicChannel()));
     }
 
     @Override
     protected void distributePut(MetaNode metaNode) {
-        redisTemplate.opsForValue().set(eruptCloudServerProp.getKeyNameSpace() + NODE_SPACE + metaNode.getNodeName(),
+        redisTemplate.opsForValue().set(eruptCloudServerProp.getCloudNameSpace() + NODE_SPACE + metaNode.getNodeName(),
                 metaNode, eruptCloudServerProp.getNodeExpireTime(), TimeUnit.MILLISECONDS);
         this.publishNodeInfo(ChannelSwapModel.Command.PUT, metaNode);
     }
 
     @Override
     protected void distributeRemove(String nodeName) {
-        redisTemplate.delete(eruptCloudServerProp.getKeyNameSpace() + NODE_SPACE + nodeName);
+        redisTemplate.delete(eruptCloudServerProp.getCloudNameSpace() + NODE_SPACE + nodeName);
         this.publishNodeInfo(ChannelSwapModel.Command.REMOVE, nodeName);
     }
 

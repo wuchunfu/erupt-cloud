@@ -5,10 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import xyz.erupt.cloud.common.consts.CloudRestApiConst;
-import xyz.erupt.cloud.server.distribute.DistributeFactory;
+import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -22,24 +21,24 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class NodeWorker implements Runnable {
 
-    private final DistributeFactory distributeFactory;
+    private final NodeManager nodeManager;
+
+    private final EruptCloudServerProp eruptCloudServerProp;
 
     @PostConstruct
     public void postConstruct() {
-        Executors.newScheduledThreadPool(3).scheduleAtFixedRate(this, 0, 60, TimeUnit.SECONDS);
+        Executors.newScheduledThreadPool(2).scheduleAtFixedRate(this, 0,
+                eruptCloudServerProp.getNodeSurviveCheckTime(), TimeUnit.MILLISECONDS);
     }
 
     @SneakyThrows
     @Override
     public void run() {
-        NodeManager.consumerNode(node -> {
-            if (new Date().getTime() - 1000 * 60 >= node.getRegisterTime().getTime()) {
-                distributeFactory.factory().removeNode(node.getNodeName()); //长时间未注册节点从 zk 中移除
-            }
+        for (MetaNode node : nodeManager.findAllNodes()) {
             if (node.getLocations().removeIf(location -> !health(location, 2))) {
-                distributeFactory.factory().putNode(node);
+                nodeManager.putNode(node);
             }
-        });
+        }
     }
 
     private boolean health(String location, int retryNum) {

@@ -1,47 +1,55 @@
 package xyz.erupt.cloud.server.node;
 
-import xyz.erupt.cloud.server.base.MetaNode;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YuePeng
  * date 2022/1/29
  */
+@Component
 public class NodeManager {
 
-    private static final Map<String, MetaNode> metaNodeMap = new ConcurrentHashMap<>();
+    public static final String NODE_SPACE = "node:";
+    @Resource
+    private RedisTemplate<String, MetaNode> redisTemplate;
+    @Resource
+    private EruptCloudServerProp eruptCloudServerProp;
 
-    public static void consumerNode(Consumer<MetaNode> consumer) {
-        for (MetaNode value : metaNodeMap.values()) {
-            consumer.accept(value);
+    private String geneKey(String nodeName) {
+        return eruptCloudServerProp.getCloudNameSpace() + NodeManager.NODE_SPACE + nodeName;
+    }
+
+    public MetaNode getNode(String nodeName) {
+        return redisTemplate.opsForValue().get(geneKey(nodeName));
+    }
+
+    public void putNode(MetaNode metaNode) {
+        if (metaNode.getLocations().size() <= 0) {
+            this.removeNode(metaNode.getNodeName());
+        } else {
+            redisTemplate.opsForValue().set(geneKey(metaNode.getNodeName()), metaNode,
+                    eruptCloudServerProp.getNodeExpireTime(), TimeUnit.MILLISECONDS);
         }
     }
 
-    public static int getMetaNodeNum() {
-        return metaNodeMap.size();
+    public void removeNode(String nodeName) {
+        redisTemplate.delete(geneKey(nodeName));
     }
 
-    //获取节点
-    public static MetaNode getNode(String appName) {
-        return metaNodeMap.get(appName);
-    }
-
-    //插入节点
-    public static void putNode(MetaNode metaNode) {
-        metaNodeMap.put(metaNode.getNodeName(), metaNode);
-    }
-
-    //移除节点
-    public static void removeNode(String nodeName) {
-        metaNodeMap.remove(nodeName);
-    }
-
-    //清空节点
-    public static void clearNodes() {
-        metaNodeMap.clear();
+    public List<MetaNode> findAllNodes() {
+        List<MetaNode> metaNodes = new ArrayList<>();
+        Optional.ofNullable(redisTemplate.keys(eruptCloudServerProp.getCloudNameSpace() + NODE_SPACE + "*")).flatMap(keys ->
+                Optional.ofNullable(redisTemplate.opsForValue().multiGet(keys))).ifPresent(metaNodes::addAll
+        );
+        return metaNodes;
     }
 
 }

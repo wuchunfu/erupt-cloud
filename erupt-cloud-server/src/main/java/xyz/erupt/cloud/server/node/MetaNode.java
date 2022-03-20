@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.server.base;
+package xyz.erupt.cloud.server.node;
 
 import lombok.Getter;
 import lombok.Setter;

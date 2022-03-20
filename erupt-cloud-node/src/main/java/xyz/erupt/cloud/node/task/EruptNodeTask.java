@@ -35,14 +35,17 @@ import static org.fusesource.jansi.Ansi.ansi;
 @Slf4j
 public class EruptNodeTask implements Runnable, ApplicationRunner, DisposableBean {
 
-    private final Gson gson = GsonFactory.getGson();
     @Resource
     private EruptNodeProp eruptNodeProp;
+
     @Resource
     private ServerProperties serverProperties;
+
     private boolean runner = true;
 
-    private String instanceId = RandomStringUtils.randomAlphabetic(6);
+    private final Gson gson = GsonFactory.getGson();
+    private final String instanceId = RandomStringUtils.randomAlphabetic(6);
+    private boolean errorConnect = false;
 
     @Override
     public void run(ApplicationArguments args) {
@@ -91,10 +94,15 @@ public class EruptNodeTask implements Runnable, ApplicationRunner, DisposableBea
                 if (!httpResponse.isOk()) {
                     log.error(httpResponse.body());
                 }
+                if (this.errorConnect) {
+                    this.errorConnect = false;
+                    log.info(address + " -> Connection success");
+                }
                 TimeUnit.MILLISECONDS.sleep(eruptNodeProp.getHeartbeatTime());
             } catch (Exception e) {
                 log.error(address + " -> {}", e.getMessage());
-                TimeUnit.SECONDS.sleep(5);
+                this.errorConnect = true;
+                TimeUnit.MILLISECONDS.sleep(eruptNodeProp.getHeartbeatTime() / 2);
             }
         }
     }

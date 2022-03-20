@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -17,7 +18,8 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.erupt.cloud.common.consts.CloudCommonConst;
-import xyz.erupt.cloud.server.base.MetaNode;
+import xyz.erupt.cloud.server.node.MetaNode;
+import xyz.erupt.cloud.server.node.NodeContext;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.config.GsonFactory;
@@ -51,6 +53,12 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
     @Resource
     private EruptContextService eruptContextService;
 
+    @Resource
+    private NodeManager nodeManager;
+
+    @Resource
+    private RedisTemplate<String, MetaNode> redisTemplate;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(this).addPathPatterns(EruptRestPath.ERUPT_API + "/**");
@@ -80,7 +88,8 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             int point = erupt.lastIndexOf(".");
             String nodeName = erupt.substring(0, point);
             String eruptName = erupt.substring(point + 1);
-            MetaNode metaNode = NodeManager.getNode(nodeName);
+            MetaNode metaNode = nodeManager.getNode(nodeName);
+            NodeContext.set(metaNode);
             if (null == metaNode) {
                 //TODO 自定义状态码
                 throw new EruptWebApiRuntimeException("'" + nodeName + "' node not ready");
@@ -107,6 +116,11 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         } else {
             return true;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        NodeContext.remove();
     }
 
     private boolean isSimpleJson(String str) {
@@ -138,7 +152,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             }
             HttpResponse httpResponse = httpRequest.addHeaders(headers).execute();
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
-                log.warn("{} -> {}", location, httpResponse.body());
+                log.warn("{} -> {}", location + path, httpResponse.body());
             }
             return httpResponse;
         } catch (ConnectException connectException) {

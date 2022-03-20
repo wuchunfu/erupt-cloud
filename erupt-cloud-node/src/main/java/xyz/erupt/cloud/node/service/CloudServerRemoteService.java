@@ -23,9 +23,9 @@ public class CloudServerRemoteService {
 
     //校验菜单权限
     public boolean getMenuCodePermission(String menuValue, String token) {
-        String permissionResult = HttpUtil.createGet(eruptNodeProp.getBalanceAddress() + EruptRestPath.ERUPT_CODE_PERMISSION)
-                .form("menuValue", menuValue)
-                .header(EruptMutualConst.TOKEN, token).execute().body();
+        String permissionResult =
+                HttpUtil.createGet(eruptNodeProp.getBalanceAddress() + EruptRestPath.ERUPT_CODE_PERMISSION + "/" + menuValue)
+                        .header(EruptMutualConst.TOKEN, token).execute().body();
         return Boolean.parseBoolean(permissionResult);
     }
 

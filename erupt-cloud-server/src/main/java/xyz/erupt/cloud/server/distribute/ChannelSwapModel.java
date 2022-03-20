@@ -1,4 +1,4 @@
-package xyz.erupt.cloud.server.model;
+package xyz.erupt.cloud.server.distribute;
 
 import lombok.Getter;
 import lombok.Setter;

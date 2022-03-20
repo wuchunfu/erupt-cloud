@@ -1,7 +1,6 @@
 package xyz.erupt.cloud.server.distribute;
 
-import xyz.erupt.cloud.server.base.MetaNode;
-import xyz.erupt.cloud.server.node.NodeManager;
+import xyz.erupt.cloud.server.node.MetaNode;
 
 /**
  * 分布式处理
@@ -20,12 +19,10 @@ public abstract class DistributeAbstract {
     protected abstract void distributeRemove(String nodeName);
 
     public void putNode(MetaNode metaNode) {
-        NodeManager.putNode(metaNode);
         this.distributePut(metaNode);
     }
 
     public void removeNode(String nodeName) {
-        NodeManager.removeNode(nodeName);
         this.distributeRemove(nodeName);
     }
 

@@ -20,9 +20,4 @@ public class DistributeFactory implements CommandLineRunner {
         redisDistribute.init();
     }
 
-    public DistributeAbstract factory() {
-        return redisDistribute;
-    }
-
-
 }

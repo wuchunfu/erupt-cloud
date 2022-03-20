@@ -1,9 +1,8 @@
 package xyz.erupt.cloud.server.service;
 
 import org.springframework.stereotype.Service;
-import xyz.erupt.cloud.server.base.MetaNode;
-import xyz.erupt.cloud.server.distribute.DistributeFactory;
 import xyz.erupt.cloud.server.model.CloudNode;
+import xyz.erupt.cloud.server.node.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.jpa.dao.EruptDao;
 import xyz.erupt.upms.util.IpUtil;
@@ -22,13 +21,13 @@ import java.util.Optional;
 public class EruptNodeMicroservice {
 
     @Resource
-    private DistributeFactory distributeFactory;
-
-    @Resource
     private EruptDao eruptDao;
 
     @Resource
     private HttpServletRequest request;
+
+    @Resource
+    private NodeManager nodeManager;
 
     public CloudNode findNodeByAppName(String nodeName, String accessToken) {
         CloudNode cloudNode = eruptDao.queryEntity(CloudNode.class, CloudNode.NODE_NAME + " = :" + CloudNode.NODE_NAME, new HashMap<String, Object>() {{
@@ -50,17 +49,16 @@ public class EruptNodeMicroservice {
     }
 
     public void registerNode(MetaNode metaNode) {
-        Optional.ofNullable(NodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
+        Optional.ofNullable(nodeManager.getNode(metaNode.getNodeName())).ifPresent(it -> metaNode.getLocations().addAll(it.getLocations()));
         metaNode.getLocations().add(geneNodeLocation(metaNode));
         metaNode.getErupts().forEach(it -> metaNode.getEruptMap().put(it, it));
         metaNode.setRegisterTime(new Date());
-        distributeFactory.factory().putNode(metaNode);
+        nodeManager.putNode(metaNode);
     }
 
+    //TODO 可能不需要知道他移除了节点
     public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
-        distributeFactory.factory().removeNode(NodeManager.getNode(nodeName).getNodeName());
     }
-
 
 }

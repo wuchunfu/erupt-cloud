@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.erupt.cloud.common.consts.CloudRestApiConst;
-import xyz.erupt.cloud.server.base.MetaNode;
 import xyz.erupt.cloud.server.base.R;
 import xyz.erupt.cloud.server.model.CloudNode;
+import xyz.erupt.cloud.server.node.MetaNode;
 import xyz.erupt.cloud.server.service.EruptNodeMicroservice;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 

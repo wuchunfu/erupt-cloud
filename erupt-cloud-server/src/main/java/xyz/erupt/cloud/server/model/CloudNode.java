@@ -3,6 +3,7 @@ package xyz.erupt.cloud.server.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import org.springframework.stereotype.Component;
 import xyz.erupt.annotation.Erupt;
 import xyz.erupt.annotation.EruptField;
 import xyz.erupt.annotation.fun.DataProxy;
@@ -12,11 +13,12 @@ import xyz.erupt.annotation.sub_field.Readonly;
 import xyz.erupt.annotation.sub_field.View;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
-import xyz.erupt.cloud.server.base.MetaNode;
+import xyz.erupt.cloud.server.node.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.util.Erupts;
 import xyz.erupt.jpa.model.MetaModelUpdateVo;
 
+import javax.annotation.Resource;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Map;
@@ -30,6 +32,7 @@ import java.util.Map;
 @Entity
 @Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = CloudNode.NODE_NAME))
 @Erupt(name = "节点管理", dataProxy = CloudNode.class)
+@Component
 public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode> {
 
     public static final String NODE_NAME = "nodeName";
@@ -99,6 +102,10 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     )
     private String remark;
 
+    @Transient
+    @Resource
+    private NodeManager nodeManager;
+
     @Override
     public void beforeAdd(CloudNode cloudNode) {
         cloudNode.setAccessToken(Erupts.generateCode(16));
@@ -107,7 +114,7 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     @Override
     public void afterFetch(Collection<Map<String, Object>> list) {
         for (Map<String, Object> map : list) {
-            MetaNode metaNode = NodeManager.getNode(map.get(NODE_NAME).toString());
+            MetaNode metaNode = nodeManager.getNode(map.get(NODE_NAME).toString());
             if (null == metaNode) {
                 map.put("eruptNum", '-');
                 map.put("instanceNum", '-');
@@ -118,5 +125,10 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
                 map.put("netCount", metaNode.getCount());
             }
         }
+    }
+
+    @Override
+    public void afterDelete(CloudNode cloudNode) {
+        nodeManager.removeNode(cloudNode.getNodeName());
     }
 }
