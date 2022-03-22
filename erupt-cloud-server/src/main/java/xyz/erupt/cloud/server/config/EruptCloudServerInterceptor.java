@@ -4,12 +4,12 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
+import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -27,6 +27,7 @@ import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 import xyz.erupt.core.service.EruptCoreService;
+import xyz.erupt.core.view.EruptBuildModel;
 import xyz.erupt.upms.service.EruptContextService;
 
 import javax.annotation.Resource;
@@ -55,9 +56,6 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
 
     @Resource
     private NodeManager nodeManager;
-
-    @Resource
-    private RedisTemplate<String, MetaNode> redisTemplate;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -110,6 +108,12 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             }
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
                 response.sendError(httpResponse.getStatus());
+            }
+            if ((EruptRestPath.ERUPT_BUILD + "/" + erupt).equals(request.getServletPath())) {
+                Gson gson = GsonFactory.getGson();
+                EruptBuildModel eruptBuildModel = gson.fromJson(httpResponse.body(), EruptBuildModel.class);
+                eruptBuildModel.getEruptModel().setEruptName(nodeName + "." + eruptBuildModel.getEruptModel().getEruptName());
+                httpResponse.writeBody(gson.toJson(eruptBuildModel));
             }
             response.getOutputStream().write(httpResponse.bodyBytes());
             return false;
