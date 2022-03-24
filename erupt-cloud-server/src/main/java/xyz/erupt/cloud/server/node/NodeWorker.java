@@ -3,6 +3,7 @@ package xyz.erupt.cloud.server.node;
 import cn.hutool.http.HttpUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import xyz.erupt.cloud.common.consts.CloudRestApiConst;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 @AllArgsConstructor
 @Component
+@Slf4j
 public class NodeWorker implements Runnable {
 
     private final NodeManager nodeManager;
@@ -35,18 +37,26 @@ public class NodeWorker implements Runnable {
     @Override
     public void run() {
         for (MetaNode node : nodeManager.findAllNodes()) {
-            if (node.getLocations().removeIf(location -> !health(location, 2))) {
+            if (node.getLocations().removeIf(location -> !health(node.getNodeName(), location, 2))) {
                 nodeManager.putNode(node);
             }
         }
     }
 
-    private boolean health(String location, int retryNum) {
-        if (retryNum <= 0) return false;
-        if (HttpUtil.createGet(location + CloudRestApiConst.NODE_HEALTH).timeout(1000).execute().isOk()) {
-            return true;
-        } else {
-            return health(location, retryNum - 1);
+    private boolean health(String nodeName, String location, int retryNum) {
+        if (retryNum <= 0) {
+            log.error("remove node: {} -> {}", nodeName, location);
+            return false;
+        }
+        try {
+            if (HttpUtil.createGet(location + CloudRestApiConst.NODE_HEALTH).timeout(1000).execute().isOk()) {
+                return true;
+            } else {
+                return health(nodeName, location, retryNum - 1);
+            }
+        } catch (Exception e) {
+            log.error("remove node: {} -> {}", nodeName, location);
+            return false;
         }
     }
 

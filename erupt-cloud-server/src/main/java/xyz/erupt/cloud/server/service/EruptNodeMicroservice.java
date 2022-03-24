@@ -56,9 +56,9 @@ public class EruptNodeMicroservice {
         nodeManager.putNode(metaNode);
     }
 
-    //TODO 可能不需要知道他移除了节点
     public void removeNode(String nodeName, String accessToken) {
         this.findNodeByAppName(nodeName, accessToken);
+//        nodeManager.removeNode();
     }
 
 }

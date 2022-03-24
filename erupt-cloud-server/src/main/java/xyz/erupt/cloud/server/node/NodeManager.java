@@ -1,6 +1,9 @@
 package xyz.erupt.cloud.server.node;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 import xyz.erupt.cloud.server.config.EruptCloudServerProp;
 
@@ -18,8 +21,16 @@ import java.util.concurrent.TimeUnit;
 public class NodeManager {
 
     public static final String NODE_SPACE = "node:";
-    @Resource
+
     private RedisTemplate<String, MetaNode> redisTemplate;
+
+    @Autowired
+    public void setRedisTemplate(RedisTemplate<?, ?> redisTemplate) {
+        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        this.redisTemplate = (RedisTemplate<String, MetaNode>) redisTemplate;
+    }
+
     @Resource
     private EruptCloudServerProp eruptCloudServerProp;
 
@@ -43,6 +54,7 @@ public class NodeManager {
     public void removeNode(String nodeName) {
         redisTemplate.delete(geneKey(nodeName));
     }
+
 
     public List<MetaNode> findAllNodes() {
         List<MetaNode> metaNodes = new ArrayList<>();

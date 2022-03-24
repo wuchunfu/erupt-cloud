@@ -92,7 +92,6 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
                 //TODO 自定义状态码
                 throw new EruptWebApiRuntimeException("'" + nodeName + "' node not ready");
             }
-
             HttpResponse httpResponse = this.httpProxy(request, metaNode, request.getRequestURI().replace(erupt, eruptName), eruptName);
             Optional.ofNullable(httpResponse.header("Content-Type")).ifPresent(response::setContentType);
             for (String transferHeader : TRANSFER_HEADERS) {
@@ -113,9 +112,10 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
                 Gson gson = GsonFactory.getGson();
                 EruptBuildModel eruptBuildModel = gson.fromJson(httpResponse.body(), EruptBuildModel.class);
                 eruptBuildModel.getEruptModel().setEruptName(nodeName + "." + eruptBuildModel.getEruptModel().getEruptName());
-                httpResponse.writeBody(gson.toJson(eruptBuildModel));
+                response.getOutputStream().write(gson.toJson(eruptBuildModel).getBytes(StandardCharsets.UTF_8));
+            } else {
+                response.getOutputStream().write(httpResponse.bodyBytes());
             }
-            response.getOutputStream().write(httpResponse.bodyBytes());
             return false;
         } else {
             return true;

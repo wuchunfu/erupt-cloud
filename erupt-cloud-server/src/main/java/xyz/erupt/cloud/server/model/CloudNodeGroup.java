@@ -7,6 +7,7 @@ import xyz.erupt.annotation.EruptField;
 import xyz.erupt.annotation.sub_field.Edit;
 import xyz.erupt.annotation.sub_field.EditType;
 import xyz.erupt.annotation.sub_field.View;
+import xyz.erupt.annotation.sub_field.ViewType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
 import xyz.erupt.jpa.model.MetaModel;
 
@@ -40,8 +41,8 @@ public class CloudNodeGroup extends MetaModel {
 
     @Lob
     @EruptField(
-            views = @View(title = "描述"),
-            edit = @Edit(title = "描述", type = EditType.HTML_EDITOR)
+            views = @View(title = "描述", type = ViewType.HTML),
+            edit = @Edit(title = "描述", type = EditType.TEXTAREA)
     )
     private String remark;
 

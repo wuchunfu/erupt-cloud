@@ -7,20 +7,21 @@ import org.springframework.stereotype.Component;
 import xyz.erupt.annotation.Erupt;
 import xyz.erupt.annotation.EruptField;
 import xyz.erupt.annotation.fun.DataProxy;
-import xyz.erupt.annotation.sub_field.Edit;
-import xyz.erupt.annotation.sub_field.EditType;
-import xyz.erupt.annotation.sub_field.Readonly;
-import xyz.erupt.annotation.sub_field.View;
+import xyz.erupt.annotation.fun.TagsFetchHandler;
+import xyz.erupt.annotation.sub_field.*;
 import xyz.erupt.annotation.sub_field.sub_edit.BoolType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
+import xyz.erupt.annotation.sub_field.sub_edit.TagsType;
 import xyz.erupt.cloud.server.node.MetaNode;
 import xyz.erupt.cloud.server.node.NodeManager;
 import xyz.erupt.core.util.Erupts;
+import xyz.erupt.jpa.dao.EruptDao;
 import xyz.erupt.jpa.model.MetaModelUpdateVo;
 
 import javax.annotation.Resource;
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +34,7 @@ import java.util.Map;
 @Table(name = "e_cloud_node", uniqueConstraints = @UniqueConstraint(columnNames = CloudNode.NODE_NAME))
 @Erupt(name = "节点管理", dataProxy = CloudNode.class)
 @Component
-public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode> {
+public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>, TagsFetchHandler {
 
     public static final String NODE_NAME = "nodeName";
 
@@ -72,7 +73,8 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
 
     @EruptField(
             views = @View(title = "负责人", sortable = true),
-            edit = @Edit(title = "负责人", type = EditType.TAGS, notNull = true)
+            edit = @Edit(title = "负责人", type = EditType.TAGS,
+                    tagsType = @TagsType(fetchHandler = CloudNode.class), notNull = true)
     )
     private String duty;
 
@@ -97,14 +99,18 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     @EruptField(
-            views = @View(title = "描述"),
-            edit = @Edit(title = "描述", type = EditType.HTML_EDITOR)
+            views = @View(title = "描述", type = ViewType.HTML),
+            edit = @Edit(title = "描述", type = EditType.TEXTAREA)
     )
     private String remark;
 
     @Transient
     @Resource
     private NodeManager nodeManager;
+
+    @Transient
+    @Resource
+    private EruptDao eruptDao;
 
     @Override
     public void beforeAdd(CloudNode cloudNode) {
@@ -130,5 +136,10 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     @Override
     public void afterDelete(CloudNode cloudNode) {
         nodeManager.removeNode(cloudNode.getNodeName());
+    }
+
+    @Override
+    public List<String> fetchTags(String[] params) {
+        return eruptDao.getJdbcTemplate().queryForList("select name from e_upms_user", String.class);
     }
 }
