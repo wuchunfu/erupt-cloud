@@ -11,6 +11,8 @@ import xyz.erupt.core.config.GsonFactory;
 import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.context.MetaContext;
 import xyz.erupt.core.invoke.PowerInvoke;
+import xyz.erupt.core.service.EruptCoreService;
+import xyz.erupt.core.view.EruptModel;
 
 import javax.annotation.Resource;
 
@@ -30,9 +32,13 @@ public class NodePowerInvoke implements PowerHandler {
 
     @Override
     public void handler(PowerObject power) {
+        EruptModel eruptModel = EruptCoreService.getErupt(MetaContext.getErupt().getName());
+        if (!eruptModel.getErupt().authVerify()) {
+            return;
+        }
         String powerObjectString = HttpUtil.createGet(eruptNodeProp.getBalanceAddress() + CloudRestApiConst.ERUPT_POWER)
                 .form("nodeName", eruptNodeProp.getNodeName())
-                .form("eruptName", MetaContext.getErupt().getName())
+                .form("eruptName", eruptModel.getEruptName())
                 .header(EruptMutualConst.TOKEN, MetaContext.getToken()).execute().body();
         BeanUtil.copyProperties(GsonFactory.getGson().fromJson(powerObjectString, PowerObject.class), power);
     }

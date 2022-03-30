@@ -9,7 +9,7 @@
     <parent>
         <groupId>xyz.erupt.cloud</groupId>
         <artifactId>erupt-cloud</artifactId>
-        <version>1.10.6</version>
+        <version>1.10.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -27,6 +27,12 @@
         <dependency>
             <groupId>xyz.erupt</groupId>
             <artifactId>erupt-upms</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>xyz.erupt</groupId>
+            <artifactId>erupt-security</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>

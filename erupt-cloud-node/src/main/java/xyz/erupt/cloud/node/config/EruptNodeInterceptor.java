@@ -10,7 +10,6 @@ import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
 import xyz.erupt.core.context.MetaContext;
 import xyz.erupt.core.context.MetaErupt;
-import xyz.erupt.core.context.MetaUser;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
 
 import javax.annotation.Resource;
@@ -40,10 +39,9 @@ public class EruptNodeInterceptor implements WebMvcConfigurer, AsyncHandlerInter
             throw new EruptWebApiRuntimeException("AccessToken incorrect");
         }
         MetaContext.registerToken(request.getHeader(EruptMutualConst.TOKEN));
-        MetaContext.register(new MetaUser("1", "test", "测试"));
         MetaContext.register(new MetaErupt(request.getHeader(EruptMutualConst.ERUPT)));
         //node节点管理的erupt类禁止浏览器直接访问
-        response.setHeader("Access-Control-Allow-Origin", "0.0.0.0");
+        response.setHeader("Access-Control-Allow-Origin", "255.255.255.255");
         return true;
     }
 

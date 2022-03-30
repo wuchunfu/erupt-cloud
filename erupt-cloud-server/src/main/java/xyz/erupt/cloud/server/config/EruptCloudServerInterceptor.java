@@ -4,7 +4,6 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
-import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,10 +24,19 @@ import xyz.erupt.core.annotation.EruptRouter;
 import xyz.erupt.core.config.GsonFactory;
 import xyz.erupt.core.constant.EruptMutualConst;
 import xyz.erupt.core.constant.EruptRestPath;
+import xyz.erupt.core.context.MetaContext;
+import xyz.erupt.core.context.MetaErupt;
+import xyz.erupt.core.context.MetaUser;
 import xyz.erupt.core.exception.EruptWebApiRuntimeException;
+import xyz.erupt.core.module.MetaUserinfo;
 import xyz.erupt.core.service.EruptCoreService;
 import xyz.erupt.core.view.EruptBuildModel;
+import xyz.erupt.core.view.EruptModel;
+import xyz.erupt.security.interceptor.EruptSecurityInterceptor;
+import xyz.erupt.upms.constant.SessionKey;
 import xyz.erupt.upms.service.EruptContextService;
+import xyz.erupt.upms.service.EruptSessionService;
+import xyz.erupt.upms.service.EruptUserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +65,15 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
     @Resource
     private NodeManager nodeManager;
 
+    @Resource
+    private EruptSessionService eruptSessionService;
+
+    @Resource
+    private EruptSecurityInterceptor eruptSecurityInterceptor;
+
+    @Resource
+    private EruptUserService eruptUserService;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(this).addPathPatterns(EruptRestPath.ERUPT_API + "/**");
@@ -83,15 +100,24 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             }
             if (!erupt.contains(".")) return true;
             if (null != EruptCoreService.getErupt(erupt)) return true;
+            String token = eruptContextService.getCurrentToken();
+            if (null == token || null == eruptSessionService.get(SessionKey.USER_TOKEN + token)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.sendError(HttpStatus.UNAUTHORIZED.value());
+                return false;
+            }
             int point = erupt.lastIndexOf(".");
             String nodeName = erupt.substring(0, point);
             String eruptName = erupt.substring(point + 1);
             MetaNode metaNode = nodeManager.getNode(nodeName);
             NodeContext.set(metaNode);
             if (null == metaNode) {
-                //TODO 自定义状态码
                 throw new EruptWebApiRuntimeException("'" + nodeName + "' node not ready");
             }
+            MetaUserinfo metaUserinfo = eruptUserService.getSimpleUserInfo();
+            MetaContext.register(new MetaUser(metaUserinfo.getId() + "", metaUserinfo.getAccount(), metaUserinfo.getUsername()));
+            MetaContext.register(new MetaErupt(erupt));
+            MetaContext.registerToken(token);
             HttpResponse httpResponse = this.httpProxy(request, metaNode, request.getRequestURI().replace(erupt, eruptName), eruptName);
             Optional.ofNullable(httpResponse.header("Content-Type")).ifPresent(response::setContentType);
             for (String transferHeader : TRANSFER_HEADERS) {
@@ -107,15 +133,18 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
             }
             if (httpResponse.getStatus() != HttpStatus.OK.value()) {
                 response.sendError(httpResponse.getStatus());
+                eruptSecurityInterceptor.afterCompletion(request, response, handler, new Exception(httpResponse.body()));
+            } else {
+                eruptSecurityInterceptor.afterCompletion(request, response, handler, null);
             }
             if ((EruptRestPath.ERUPT_BUILD + "/" + erupt).equals(request.getServletPath())) {
-                Gson gson = GsonFactory.getGson();
-                EruptBuildModel eruptBuildModel = gson.fromJson(httpResponse.body(), EruptBuildModel.class);
-                eruptBuildModel.getEruptModel().setEruptName(nodeName + "." + eruptBuildModel.getEruptModel().getEruptName());
-                response.getOutputStream().write(gson.toJson(eruptBuildModel).getBytes(StandardCharsets.UTF_8));
+                EruptBuildModel eruptBuildModel = GsonFactory.getGson().fromJson(httpResponse.body(), EruptBuildModel.class);
+                this.eruptBuildProcess(eruptBuildModel, nodeName);
+                response.getOutputStream().write(GsonFactory.getGson().toJson(eruptBuildModel).getBytes(StandardCharsets.UTF_8));
             } else {
                 response.getOutputStream().write(httpResponse.bodyBytes());
             }
+            NodeContext.remove();
             return false;
         } else {
             return true;
@@ -124,6 +153,7 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        eruptSecurityInterceptor.afterConcurrentHandlingStarted(request, response, handler);
         NodeContext.remove();
     }
 
@@ -162,6 +192,26 @@ public class EruptCloudServerInterceptor implements WebMvcConfigurer, AsyncHandl
         } catch (ConnectException connectException) {
             throw new EruptWebApiRuntimeException(location + " -> " + connectException.getMessage());
         }
+    }
+
+    private void eruptBuildProcess(EruptBuildModel eruptBuildModel, String nodeName) {
+        String prefix = nodeName + ".";
+        eruptBuildModel.getEruptModel().setEruptName(prefix + eruptBuildModel.getEruptModel().getEruptName());
+        Optional.ofNullable(eruptBuildModel.getOperationErupts()).ifPresent(it -> {
+            for (EruptModel value : it.values()) {
+                value.setEruptName(prefix + value.getEruptName());
+            }
+        });
+        Optional.ofNullable(eruptBuildModel.getTabErupts()).ifPresent(it -> {
+            for (EruptBuildModel value : it.values()) {
+                value.getEruptModel().setEruptName(prefix + value.getEruptModel().getEruptName());
+            }
+        });
+        Optional.ofNullable(eruptBuildModel.getCombineErupts()).ifPresent(it -> {
+            for (EruptModel value : it.values()) {
+                value.setEruptName(prefix + value.getEruptName());
+            }
+        });
     }
 
 }
