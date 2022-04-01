@@ -90,11 +90,11 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
     )
     private Integer instanceNum;
 
-    @Transient
-    @EruptField(
-            views = @View(title = "请求次数", className = "text-center")
-    )
-    private Integer netCount;
+//    @Transient
+//    @EruptField(
+//            views = @View(title = "请求次数", className = "text-center")
+//    )
+//    private Integer netCount;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -124,11 +124,11 @@ public class CloudNode extends MetaModelUpdateVo implements DataProxy<CloudNode>
             if (null == metaNode) {
                 map.put("eruptNum", '-');
                 map.put("instanceNum", '-');
-                map.put("netCount", '-');
+//                map.put("netCount", '-');
             } else {
                 map.put("eruptNum", metaNode.getErupts().size());
                 map.put("instanceNum", metaNode.getLocations().size());
-                map.put("netCount", metaNode.getCount());
+//                map.put("netCount", metaNode.getCount());
             }
         }
     }
